@@ -63,7 +63,7 @@ function updateControls(){
   $('input-badge').textContent=state.input==='camera'?'CAMERA · LOCAL':state.input==='keyboard'?(state.mode==='stretch'?'GUIDE · 안내':'KEYBOARD · 체험'):'입력 대기';
   $('stage-message').hidden=state.phase!=='idle';
   $('stage-message').querySelector('h2').textContent=state.input?'준비됐어요. 편안하게 시작하세요.':'당신의 움직임을 기다리고 있어요';
-  $('stage-message').querySelector('p').textContent=state.input?'플레이 시작을 누르면 3초 뒤 시작합니다.':'카메라를 켜거나 키보드 체험으로 시작하세요.';
+  $('stage-message').querySelector('p').textContent=state.input?'플레이 시작을 누르면 3초 뒤 시작합니다.':state.mode==='stretch'?'카메라를 켜거나 카메라 없이 안내 보기를 선택하세요.':'카메라를 켜거나 키보드 체험으로 시작하세요.';
 }
 function selectMode(mode){
   if(active()||starting||songLoading)return;
