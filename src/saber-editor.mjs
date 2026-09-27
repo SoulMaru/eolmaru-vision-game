@@ -165,6 +165,7 @@ export function createChartEditor({onApply=()=>{},onNotice=()=>{}}={}) {
   function tick(now) {
     frame=0;if(!dialog.open||!audio||audio.paused)return;
     if(loop.checked&&validLoop()&&(audio.currentTime>=Number(loopEnd.value)||audio.currentTime<Number(loopStart.value)))audio.currentTime=Number(loopStart.value);
+    if(audio.currentTime>=duration){audio.pause();audio.currentTime=duration;paintClock();return;}
     if(now-lastPaint>=50){lastPaint=now;paintClock();}
     frame=requestAnimationFrame(tick);
   }
@@ -173,6 +174,7 @@ export function createChartEditor({onApply=()=>{},onNotice=()=>{}}={}) {
     if(!audio.paused){audio.pause();paintClock();return;}
     const own=audio,ticket=generation;
     try {
+      if(own.currentTime>=duration)own.currentTime=0;
       if(loop.checked){if(!validLoop()){announce('반복 구간의 시작·끝을 확인해 주세요.',true);return;}if(own.currentTime>=Number(loopEnd.value)||own.currentTime<Number(loopStart.value))own.currentTime=Number(loopStart.value);}
       await own.play();
       if(ticket!==generation||audio!==own||!dialog.open){own.pause();return;}
@@ -247,6 +249,7 @@ export function createChartEditor({onApply=()=>{},onNotice=()=>{}}={}) {
       const own=new Audio();audio=own;own.preload='metadata';own.src=src;own.volume=.65;
       own.addEventListener('pause',()=>{if(audio===own){if(frame)cancelAnimationFrame(frame);frame=0;paintClock();}});
       own.addEventListener('seeked',()=>{if(audio===own)paintClock();});
+      own.addEventListener('timeupdate',()=>{if(audio===own&&own.currentTime>=duration){if(loop.checked&&validLoop()){own.currentTime=Number(loopStart.value);}else{own.pause();if(own.currentTime>duration)own.currentTime=duration;}paintClock();}});
       own.addEventListener('ended',()=>{
         if(audio!==own||!dialog.open)return;
         if(loop.checked&&validLoop()){own.currentTime=Number(loopStart.value);togglePlay();}else paintClock();

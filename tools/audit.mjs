@@ -14,6 +14,7 @@ const groups=new Map();for(const item of entries){const key=item.sha256;groups.s
 const duplicates=[...groups.values()].filter(x=>x.length>1);
 const required=['public/index.html','public/audio/maru-flow.ogg','public/audio/voice/manifest.json','public/models/pose_landmarker_lite.task','public/vendor/vision/vision_bundle.mjs','public/vendor/vision/wasm/vision_wasm_internal.wasm','public/vendor/vision/wasm/vision_wasm_nosimd_internal.wasm','public/assets/icon.svg'];
 const musicFiles=[...new Set([...BUILTIN_SONGS,...SET_TRACKS].map(song=>song.src))];
+required.push('public/assets/dance-a.png','public/assets/dance-b.png','public/assets/eolmaru-vision.ico');
 required.push(...musicFiles.flatMap(src=>[`public${src}`,`public${src.replace(/\.ogg$/,'.json')}`]),...BUILTIN_SONGS.map(song=>`public${song.chart}`));
 const missing=[];for(const file of required){try{await stat(path.join(root,file));}catch{missing.push(file);}}
 const voiceErrors=[];

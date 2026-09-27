@@ -84,3 +84,11 @@
 - VG01: Qwen 짧은 원고의 생성이 비정상적으로 늘어남 → 해당 소유 작업을 중단하고 프로젝트 어댑터에 문장 길이별 생성 토큰 상한·길이 검사·최대3시드 재시도 추가. F 원본 파일은 변경하지 않았다. `Qwen3 TTS short text runaway max_new_tokens`
 - 검의 긴 몸체/손 그림/잔상은 장식이며 실제 충돌은 관측 손목의 밝은 검 끝이다. 손가락 쥠 인식은 추가하지 않았다.
 - 이번 음성은 특정 실존 인물의 복제가 없는 가상 캐릭터 합성이다. 모든 안내의 실제 감정/발음 만족도와 카메라 1~2인 체감은 수동 검증 대기.
+
+## 0.7 아케이드 추가 이력
+
+- AR-R01 해결: B포즈에서일시정지하면A로튀던현상. paused/resuming도고정audio.currentTime으로같은포즈를유지한다. review-arcade 및browser-dance검사. 검색어: beat sprite pause resume audio clock.
+- AR-R02 해결: Node자식WindowsPowerShell5가PS7의모듈경로를상속하면Get-FileHash/Utility로드실패. 실행기와설치기가자신의PSHOME/Modules를앞에추가한다.시스템영구환경은변경하지않는다. 검색어: PSModulePath Windows PowerShell node spawn utility module.
+- H10: 새블래스터효과의실제스피커타격감과음악/칭찬균형청취대기.21PCM조건/최대피크정상은사람취향승인이아니다.설정에서타격음미리듣기/별도음량사용. 검색어: Web Audio transient sound design loudness limiter mix.
+- H11: 바로가기는프로젝트의고정절대경로를열며폴더이동은자동추적하지않는다.이폴더파일업데이트는반영한다.폴더이동시기존링크를정리한뒤새폴더tools/install-shortcut.ps1로재설치. 자동Git pull/배포서버/업데이터서비스없음.
+- 긴곡의앞150초자동사용과120초미만거부는현재한곡2~3분정책이다.임의구간선택/자동BPM·비트분석은미구현이며H06을따른다.

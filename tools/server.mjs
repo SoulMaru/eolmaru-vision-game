@@ -1,16 +1,24 @@
 import http from 'node:http';
 import { createReadStream } from 'node:fs';
-import { stat } from 'node:fs/promises';
+import { stat, readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const serverHash = createHash('sha256').update(await readFile(fileURLToPath(import.meta.url))).digest('hex');
 const port = Number(process.env.PORT || 8765);
 const types = { '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.mjs':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.json':'application/json; charset=utf-8', '.wasm':'application/wasm', '.task':'application/octet-stream', '.svg':'image/svg+xml', '.png':'image/png', '.webp':'image/webp', '.ogg':'audio/ogg', '.mp3':'audio/mpeg', '.wav':'audio/wav' };
 const server = http.createServer(async (req, res) => {
   try {
     if (!['GET','HEAD'].includes(req.method)) { res.writeHead(405).end(); return; }
     const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+    if (pathname === '/__eolmaru') {
+      const { version } = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
+      const body = JSON.stringify({ appId:'eolmaru-vision', root, version, serverHash });
+      res.writeHead(200, { 'Content-Type':'application/json; charset=utf-8', 'Cache-Control':'no-store', 'Content-Length':Buffer.byteLength(body) });
+      res.end(req.method === 'HEAD' ? undefined : body); return;
+    }
     const base = pathname.startsWith('/src/') ? path.join(root,'src') : path.join(root,'public');
     const relative = pathname.startsWith('/src/') ? pathname.slice(5) : pathname === '/' ? 'index.html' : pathname.slice(1);
     const file = path.resolve(base, relative);

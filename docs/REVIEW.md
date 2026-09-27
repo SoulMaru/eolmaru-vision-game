@@ -1,5 +1,7 @@
 # 검토엔진 검수 기록
 
+최신 **0.7**의 독립 검토는 [ARCADE_REVIEW](ARCADE_REVIEW.md), 실제 통합 증거는 [TEST_RESULTS](TEST_RESULTS.md)에 있다. 아래0.6 이하의 검사 수와120~180초 파일 제한은 해당 과거 버전의 기록이다. 현재 긴 파일 정책은 원본 보존·앞150초다.
+
 최신0.6의 독립 검토와 재현 결과는 [TRAINING_REVIEW](TRAINING_REVIEW.md), 통합 브라우저 증거는 [TEST_RESULTS](TEST_RESULTS.md)를 읽는다. 아래 검사 수는 각 과거 시점의 이력이며 현재 전체 수가 아니다.
 
 검수자: 독립 검토엔진 AI. 작성 기준: 2026-09-27 KST. 생성엔진과 동일한 소스 저장소를 읽되 앱 구현은 수정하지 않는다.

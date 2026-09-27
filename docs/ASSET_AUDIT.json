@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-09-27T09:10:23.675Z",
-  "runtimeFiles": 99,
-  "runtimeBytes": 52938273,
+  "checkedAt": "2026-09-27T09:40:55.052Z",
+  "runtimeFiles": 104,
+  "runtimeBytes": 56768283,
   "missing": [],
   "duplicates": [],
   "voiceErrors": [],
@@ -12,6 +12,21 @@
       "file": "public/assets/icon.svg",
       "bytes": 410,
       "sha256": "b53a451a4b68441d52d0161432e7a61dabe537632c7f565689a54c7ac2fe3036"
+    },
+    {
+      "file": "public/assets/dance-a.png",
+      "bytes": 1894084,
+      "sha256": "19772bd72d97d026dcc518c34fbcdf73ee0604f48e8eaa548a6d8b2a13da32f8"
+    },
+    {
+      "file": "public/assets/dance-b.png",
+      "bytes": 1919277,
+      "sha256": "e544f1f350fb9f6a17542e55ea950d763625917a1f00aa1492019169d144e79b"
+    },
+    {
+      "file": "public/assets/eolmaru-vision.ico",
+      "bytes": 8434,
+      "sha256": "3b83b0f8d55865476caeba24f6955dfcf326e38e631ae54b3da4db30e2980317"
     },
     {
       "file": "public/vendor/vision/wasm/vision_wasm_internal.js",
@@ -360,13 +375,13 @@
     },
     {
       "file": "public/index.html",
-      "bytes": 13543,
-      "sha256": "2d83d3ec6d95f5080080d9ab38f81e2956ac4fe14557e16e5a6e0f6c3dd1c541"
+      "bytes": 14329,
+      "sha256": "530a109b9407b2486b642064a92b0f0fe7b03a317539994e26b861e11fa74f23"
     },
     {
       "file": "public/style.css",
-      "bytes": 13202,
-      "sha256": "6c72f5b23bcad06f57577cc56eda0d19cdebdde4bc5ad8e905b368fe6f50af0c"
+      "bytes": 13322,
+      "sha256": "2d7a6a2f44c5c33bdbdfb60bbb082ec5fccc9b7ded82bc340a8cc8e4df6c8166"
     },
     {
       "file": "public/saber-editor.css",
@@ -430,8 +445,8 @@
     },
     {
       "file": "src/app.mjs",
-      "bytes": 42353,
-      "sha256": "5c6a615548943046d1a2041fbe33942c890399dab41f5b9d6e240761816900bd"
+      "bytes": 43525,
+      "sha256": "b616c9f6343a033402f7061a3f24324ca450e1ea9330875e99adf45f3b52c2c6"
     },
     {
       "file": "src/routine.mjs",
@@ -480,18 +495,18 @@
     },
     {
       "file": "src/saber-render.mjs",
-      "bytes": 23725,
-      "sha256": "10fa10e3429ef091847e5cbb6ca6cfaf4d5f6d7ee9ecda5c5bdf6375531cc2d7"
+      "bytes": 23859,
+      "sha256": "1d4321ddd342bbc6979e4230bd2ad669ea77d98604ce74030e52e8e50418569f"
     },
     {
       "file": "src/saber-game.mjs",
-      "bytes": 9585,
-      "sha256": "f1224b6d659a3a2431416874de9c158a84730411dfaff7098d3701ce7c549a1e"
+      "bytes": 9625,
+      "sha256": "b9a3836cae6189f02390fb186a7c751c34c885529383f126d81ea654c04bbbcc"
     },
     {
       "file": "src/saber-editor.mjs",
-      "bytes": 17554,
-      "sha256": "a6e011ff3ea8c618652e79bcd20c46f77a7542aab981ab00bfd1abf1ef4a9c25"
+      "bytes": 17955,
+      "sha256": "72c8e169206a8204621a4d0efc5e1431509dac55074f85e52cbcb4cba11969ca"
     },
     {
       "file": "src/songs.mjs",
@@ -500,8 +515,18 @@
     },
     {
       "file": "src/saber-feedback.mjs",
-      "bytes": 6667,
-      "sha256": "bed3e5e83f76a7c93ab2b80ae1908e30870d85c8505b35044f03010ca818a578"
+      "bytes": 7104,
+      "sha256": "6277a5ca772d245d5d471f1ffa816fa9514988651d99faddedc8c64a51023cad"
+    },
+    {
+      "file": "src/local-music.mjs",
+      "bytes": 469,
+      "sha256": "4ffa0b80f70ba822ee7ad0f9ed15aa7671c256c27d3d109df6fa3caccac856a3"
+    },
+    {
+      "file": "src/saber-dance.mjs",
+      "bytes": 4656,
+      "sha256": "da42d3eac6665541e7ea1764a114d592bf961645eb10bab0f85a8ccc7a8ea92e"
     }
   ]
 }

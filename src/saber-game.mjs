@@ -4,8 +4,8 @@ import {createHands,assignSaberPlayers,calibrationFromPose,poseHand,calibrationM
 import {drawSaber,stageToGrid} from './saber-render.mjs';
 
 export class SaberGame {
-  constructor({stage,audio,phase,players,input,notice,onHit,onReset,latency,range,quality,trainingSettings=()=>({})}){
-    Object.assign(this,{stage,audio,phase,players,input,notice,onHit,onReset,latency,range,quality,trainingSettings});
+  constructor({stage,audio,phase,players,input,notice,onHit,onReset,latency,range,quality,trainingSettings=()=>({}),dance=()=>null}){
+    Object.assign(this,{stage,audio,phase,players,input,notice,onHit,onReset,latency,range,quality,trainingSettings,dance});
     this.chart=generateEasyChart();this.selected={player:0,hand:'left'};this.keys=new Set();this.sessionId=0;this.epoch=0;
     this.calibrations=[null,null];this.cameraPoses=[null,null];this.status=['손을 편안하게 준비해요','손을 편안하게 준비해요'];
     this.points=[{left:{x:1.5,y:2.7},right:{x:2.5,y:2.7}},{left:{x:1.5,y:2.7},right:{x:2.5,y:2.7}}];
@@ -107,7 +107,7 @@ export class SaberGame {
   draw(ctx,w,h,{reduced=false}={}){
     const idle=this.phase()==='idle',time=idle?performance.now()/1000:this.audio.currentTime;
     const slots=Array.from({length:this.players()},(_,p)=>({hands:Object.fromEntries(HANDS.map(hand=>[hand,this.hands[p][hand].display()])),notes:idle?[]:visibleNotes(this.playChart,this.sessions[p].states,time).map(n=>n.kind==='sustain'?{...n,sustainProgress:this.sessions[p].sustainProgress(n).coverage}:n),status:this.status[p],counts:this.sessions[p].counts}));
-    drawSaber(ctx,w,h,{time,bpm:this.chart.bpm,leadSeconds:this.playChart.leadSeconds,slots,phase:this.phase(),effects:this.effects,reduced,quality:this.quality(),selected:this.selected});
+    drawSaber(ctx,w,h,{time,bpm:this.chart.bpm,leadSeconds:this.playChart.leadSeconds,slots,phase:this.phase(),effects:this.effects,reduced,quality:this.quality(),selected:this.selected,dance:this.dance()});
   }
   finish(){this.sessions.forEach(s=>s.advance(this.chart.duration));this.resetInput();return this.sessions.slice(0,this.players()).map(s=>s.summary());}
   summary(){return this.sessions.slice(0,this.players()).map(s=>s.summary());}

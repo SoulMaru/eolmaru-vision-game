@@ -1,5 +1,6 @@
 // Original local Canvas artwork. Render coordinates never feed back into hit judgement.
 // The bright tip is the observed wrist point; the blade is a decorative representation.
+import {drawDanceBackdrop} from './saber-dance.mjs';
 const PALETTE = {
   left: {fill:'#eb4269', dark:'#642a59', edge:'#ff9bb1', glow:'#ff537f', name:'L'},
   right: {fill:'#228adc', dark:'#174784', edge:'#91eaff', glow:'#45ceff', name:'R'},
@@ -383,13 +384,14 @@ function drawGradeLabel(c,r,e,time,reduced,low) {
 }
 
 /** Main render; no clock, DOM, browser global, mutation, or external resources. */
-export function drawSaber(c,w,h,{time=0,bpm=112,leadSeconds=1.8,slots=[],phase='idle',effects=[],reduced=false,quality='high',selected={player:0,hand:'left'}}={}) {
+export function drawSaber(c,w,h,{time=0,bpm=112,leadSeconds=1.8,slots=[],phase='idle',effects=[],reduced=false,quality='high',dance,selected={player:0,hand:'left'}}={}) {
   if(!c||!finite(w)||!finite(h)||w<=0||h<=0)return;
   const players=slots.length===2?2:1,low=quality==='low';
   time=finite(time)?time:0;
   leadSeconds=finite(leadSeconds)&&leadSeconds>0?leadSeconds:1.8;
   c.save();c.globalAlpha=1;c.lineCap='butt';c.setLineDash([]);
   const pulse=atmosphere(c,w,h,time,bpm,reduced,low);
+  drawDanceBackdrop(c,w,h,{dance,time,bpm,phase,reduced,quality,players});
   const compact=w<600,headerSize=compact?10:13;
   text(c,'얼마루 / NEON SABER',Math.max(10,w*.018),Math.min(24,h*.062),headerSize,'#e0eaff','left',800);
   if(w>420)text(c,'L  빨강 왼손     R  파랑 오른손',w-Math.max(10,w*.018),Math.min(24,h*.062),compact?9:11,'#aac0db','right');
