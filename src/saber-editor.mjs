@@ -74,6 +74,11 @@ export function createChartEditor({onApply=()=>{},onNotice=()=>{}}={}) {
   const choiceRow=row(editSection);
   const direction=select('방향',DIRECTIONS.map(d=>[d,DIR_LABEL[d]]),choiceRow);
   const snap=select('기록 박자 스냅',[['2','2박'],['1','1박'],['0','끄기']],choiceRow);
+  const kind=select('타겟 종류',[['tap','한 번 베기'],['sustain','계속 베기']],choiceRow);
+  const holdTime=field('계속 베기 초 · 0.5~6','input',{type:'number',min:.5,max:6,step:.1,value:2,disabled:true},editSection);
+  function syncKind(){holdTime.disabled=kind.value!=='sustain';direction.disabled=kind.value==='sustain';if(direction.disabled)direction.value='any';}
+  kind.addEventListener('change',syncKind);
+  el('small',{text:'계속 베기는 같은 손으로 영역 안을 움직여요. 끝나고 0.5초 뒤에 같은 손·칸의 다음 타겟을 놓으세요.'},editSection);
   const noteTime=field('선택 노트 시간 초','input',{type:'number',min:0,step:.000001,value:0},editSection);
   const record=button('현재 음악 시간에 기록',editSection,()=>recordNow());record.classList.add('saber-editor-primary');
   const list=field('기록한 노트 선택','select',{size:5,'aria-label':'기록한 노트 선택'},editSection);
@@ -114,7 +119,7 @@ export function createChartEditor({onApply=()=>{},onNotice=()=>{}}={}) {
       draft=next;sync();announce(message);return true;
     } catch(error){announce(error.message,true);return false;}
   }
-  function noteFields(){return {lineIndex:Number(column.value),lineLayer:Number(layer.value),hand:hand.value,cutDirection:direction.value};}
+  function noteFields(){return {lineIndex:Number(column.value),lineLayer:Number(layer.value),hand:hand.value,cutDirection:kind.value==='sustain'?'any':direction.value,...(kind.value==='sustain'?{kind:'sustain',durationSeconds:Number(holdTime.value)}:{})};}
   function recordNow() {
     if(!audio||!draft||applying)return;
     let time=audio.currentTime-draft.offsetSeconds;
@@ -129,7 +134,7 @@ export function createChartEditor({onApply=()=>{},onNotice=()=>{}}={}) {
     if(!draft)return;
     bpm.value=draft.bpm;offset.value=draft.offsetSeconds;
     list.replaceChildren();
-    for(const n of draft.notes)el('option',{value:n.id,text:`${fmt(n.time+draft.offsetSeconds)}  ${n.hand==='left'?'L':'R'} ${DIR_LABEL[n.cutDirection]}  ${n.lineIndex+1}열 ${n.lineLayer+1}층`},list);
+    for(const n of draft.notes)el('option',{value:n.id,text:`${fmt(n.time+draft.offsetSeconds)}  ${n.hand==='left'?'L':'R'} ${n.kind==='sustain'?`∞ 계속 ${n.durationSeconds.toFixed(2)}초`:DIR_LABEL[n.cutDirection]}  ${n.lineIndex+1}열 ${n.lineLayer+1}층`},list);
     if(!draft.notes.some(n=>n.id===chosen))chosen=draft.notes[0]?.id??'';
     list.value=chosen;undo.disabled=!history.length;
     update.disabled=remove.disabled=!chosen;apply.disabled=applying;
@@ -139,6 +144,7 @@ export function createChartEditor({onApply=()=>{},onNotice=()=>{}}={}) {
   function populateNote() {
     const n=draft?.notes.find(n=>n.id===chosen);if(!n)return;
     column.value=n.lineIndex;layer.value=n.lineLayer;hand.value=n.hand;direction.value=n.cutDirection;noteTime.value=n.time;
+    kind.value=n.kind??'tap';holdTime.value=n.durationSeconds??2;syncKind();
   }
   function validLoop() {
     const start=Number(loopStart.value),end=Number(loopEnd.value);
@@ -148,12 +154,12 @@ export function createChartEditor({onApply=()=>{},onNotice=()=>{}}={}) {
     if(!audio||!draft)return;
     const t=Number.isFinite(audio.currentTime)?audio.currentTime:0;
     seek.value=t;clock.textContent=`${fmt(t)} / ${fmt(duration)}`;play.textContent=audio.paused?'재생':'일시정지';
-    const upcoming=draft.notes.filter(n=>{const delta=n.time+draft.offsetSeconds-t;return delta>=-.15&&delta<=.55;});
+    const upcoming=draft.notes.filter(n=>{const delta=n.time+draft.offsetSeconds-t;return delta>=-(n.durationSeconds??.15)&&delta<=.55;});
     const key=upcoming.map(n=>n.id).join('|');
     if(key!==lastPreview) {
       lastPreview=key;
       cells.forEach(cell=>{cell.textContent='·';delete cell.dataset.hand;});
-      for(const n of upcoming){const cell=cells[n.lineLayer*4+n.lineIndex];cell.textContent=`${n.hand==='left'?'L':'R'} ${DIR_LABEL[n.cutDirection].split(' ')[0]}`;cell.dataset.hand=n.hand;}
+      for(const n of upcoming){const cell=cells[n.lineLayer*4+n.lineIndex];cell.textContent=`${n.hand==='left'?'L':'R'} ${n.kind==='sustain'?'∞':DIR_LABEL[n.cutDirection].split(' ')[0]}`;cell.dataset.hand=n.hand;}
     }
   }
   function tick(now) {

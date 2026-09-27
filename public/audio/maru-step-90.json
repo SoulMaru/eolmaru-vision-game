@@ -1,0 +1,197 @@
+{
+  "id": "maru-step-90",
+  "title": "Maru Velvet Bounce · 벨벳 바운스",
+  "file": "maru-step-90.ogg",
+  "artist": "얼마루 비전게임",
+  "bpm": 90,
+  "duration": 149.333333,
+  "durationSeconds": 149.33333333333331,
+  "beatOffsetSeconds": 0,
+  "beats": 224,
+  "bars": 56,
+  "timeSignature": "4/4",
+  "sampleRate": 44100,
+  "channels": 2,
+  "seed": 20261190,
+  "genre": "soft house dance",
+  "key": "D minor",
+  "license": "CC0-1.0",
+  "vocals": false,
+  "externalSamples": false,
+  "neuralModelUsed": false,
+  "engine": {
+    "mode": "F-drive-signature-plus-original-tempo-training-composition",
+    "source": "F:\\0.SoulmaruAI\\1.aiimage\\webtoon-translator\\local-api\\backend\\python\\video\\webtoon.py",
+    "function": "signature_soundtrack",
+    "sha256": "de182299dbf5216aaeaaa08303ae19c8785a537518b9ba1d3e44f6164edf3df3",
+    "functionSha256": "af31ddaee30f774d39ee6b6cf27a93b60aaa2ce8d7638aeddbaadc841db6b51c",
+    "use": "AST-extracted function actually called; rendered short motif pitch-shifted to the track's related major key and placed in the intro/outro only.",
+    "neuralModelUsed": false,
+    "sourceModified": false,
+    "motifTransposeSemitones": 5
+  },
+  "generator": "tools/music-training-compose.py",
+  "generatorSha256": "36c80db719ba62b222ab37f18d194aa57666c451be02a57000888bd43a64e5c8",
+  "helperGenerator": "tools/music-dance-compose.py",
+  "helperGeneratorSha256": "8f6f7505f1aaaf6d4bd67e989c3abc03608cd16d6a65dbe8beb8fc859355c757",
+  "sections": [
+    {
+      "name": "intro",
+      "startBar": 0,
+      "endBar": 4,
+      "startSeconds": 0.0,
+      "endSeconds": 10.666666667
+    },
+    {
+      "name": "groove",
+      "startBar": 4,
+      "endBar": 16,
+      "startSeconds": 10.666666667,
+      "endSeconds": 42.666666667
+    },
+    {
+      "name": "first-lift",
+      "startBar": 16,
+      "endBar": 28,
+      "startSeconds": 42.666666667,
+      "endSeconds": 74.666666667
+    },
+    {
+      "name": "short-break",
+      "startBar": 28,
+      "endBar": 32,
+      "startSeconds": 74.666666667,
+      "endSeconds": 85.333333333
+    },
+    {
+      "name": "build",
+      "startBar": 32,
+      "endBar": 36,
+      "startSeconds": 85.333333333,
+      "endSeconds": 96.0
+    },
+    {
+      "name": "final-lift",
+      "startBar": 36,
+      "endBar": 52,
+      "startSeconds": 96.0,
+      "endSeconds": 138.666666667
+    },
+    {
+      "name": "outro",
+      "startBar": 52,
+      "endBar": 56,
+      "startSeconds": 138.666666667,
+      "endSeconds": 149.333333333
+    }
+  ],
+  "arrangement": {
+    "leadVoice": "mallet",
+    "chordsMidi": [
+      [
+        50,
+        53,
+        57
+      ],
+      [
+        46,
+        50,
+        53
+      ],
+      [
+        48,
+        52,
+        55
+      ],
+      [
+        53,
+        57,
+        60
+      ]
+    ],
+    "hookMidi": [
+      74,
+      77,
+      81,
+      77,
+      76,
+      74,
+      69,
+      72,
+      74,
+      81,
+      79,
+      77,
+      72,
+      76,
+      77,
+      74
+    ],
+    "eighthNoteMask": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      1,
+      0
+    ],
+    "tempoResampledFromExistingSong": false,
+    "drums": "Quarter-note kick through every section; 2/4 clap, quantized eighth/sixteenth hats and restrained fills.",
+    "bass": "Offbeat original synthesis; no imported music/drum samples.",
+    "mastering": "Two-pass -14 LUFS / -2 dBTP loudnorm; exact sample trim and PTS; Vorbis quality 5."
+  },
+  "timing": {
+    "grid": "Generated at exact n * 60 / BPM; each event rounded only once to an integer audio sample.",
+    "maxSchedulingRoundingSeconds": 1.1337868480725624e-05,
+    "firstEightKickSeconds": [
+      0.0,
+      0.666666667,
+      1.333333333,
+      2.0,
+      2.666666667,
+      3.333333333,
+      4.0,
+      4.666666667
+    ],
+    "firstEightKickSamples": [
+      0,
+      29400,
+      58800,
+      88200,
+      117600,
+      147000,
+      176400,
+      205800
+    ],
+    "durationSampleRoundingSeconds": 2.842170943040401e-14
+  },
+  "measurements": {
+    "masterPeak": 0.78,
+    "masterRms": 0.130737,
+    "masterPcmSha256": "dd0c766330b0d9e8d03444bc634c605b3cba201f96ba2912a962ec70fbf11c00",
+    "decodedPeak": 0.817957,
+    "decodedPeakDbFS": -1.745,
+    "decodedRms": 0.183872,
+    "decodedRmsDbFS": -14.71,
+    "integratedLufs": -14.4,
+    "truePeakDbTP": -1.7,
+    "loudnessRangeLU": 2.9,
+    "decodedFrames": 6585600,
+    "fullDecodePassed": true,
+    "fileBytes": 1788016,
+    "sha256": "99a76ece1922f423008f34bf3240a2348db0b11cca35b791c3e2d993f13e9c47"
+  },
+  "preservation": {
+    "preExistingAudioFiles": 48,
+    "snapshotSha256": "41e1183d0872c9d59d6f768266442a2dcd694254106b9784b99e33ba6745d68c",
+    "verifiedUnchanged": true
+  },
+  "toolVersions": {
+    "python": "3.12.10",
+    "numpy": "2.5.2",
+    "ffmpeg": "ffmpeg version 8.1.2-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers"
+  },
+  "review": "Complete Ogg decode, frame length, peak/RMS/LUFS, source/generator hashes and preservation measured. Human listening, timbre preference and physical speaker/game synchronization remain unverified."
+}

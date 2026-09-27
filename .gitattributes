@@ -6,6 +6,7 @@
 *.cmd text eol=crlf
 *.ps1 text eol=crlf
 tools/music-dance-compose.py text eol=lf
+tools/music-training-compose.py text eol=lf
 tools/voice-local-server.py text eol=lf
 *.ogg binary
 *.png binary

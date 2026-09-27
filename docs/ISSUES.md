@@ -11,6 +11,15 @@
 | H05 | 한국어 안내/칭찬의 감정·발음·음색 일관성과 음악 균형 | F Qwen VoiceDesign sunny/girl_story bright, 안내/칭찬/타격음 별도 볼륨. 설계 음성은 문장 간 음색이 달라질 수 있음 | 사람 청취. `Qwen3 TTS VoiceDesign Korean expressive short utterance` |
 | H06 | 사용자 곡의 비트가 채보와 안 맞음 | 사용자 BPM 연습채보, 편집기에서offset·노트시각수정/JSON입력가능 | 인트로·변박 자동분석은 미구현. 기본곡 또는수동편집사용. `audio beat detection onset tempo offset local` |
 | H07 | 발끝/목의 움직임을 정확하게 평가하고 싶음 | 해당 동작 시간 안내, 수행/효과 점수 없음 | 다중시점·개인 보정·실제 영상 검증 없이는 정밀 기능이라고 주장하지 않음 |
+| H08 | 80~140 BPM별 음색·박자 가독성 및 지속 동작의 편안함 | 고유7곡·정박 합성·2~4박 계속 베기, 진행 중 정지 제외 | 실제 청취 및1/2인 카메라 완주 대기. `tempo training techno beat clarity sustain movement coverage` |
+| H09 | 느린 마우스 이벤트 전달에서 계속 베기 진행이 적게 나옴 | 시험 입력은 화면 프레임마다 관측하며 정지한 프레임은 누적하지 않음. 카메라는 새 추론 표본만 사용 | 실제 마우스/터치패드 저빈도 장치 체감 확인. 포인터 자동화는 RAF마다 새 위치를 보내 연속 이동을 재현. `pointer coalesced events frame cadence rhythm sustain` |
+
+## 0.6 개발 중 확인·정리
+
+- TR00: 기존 음악 메타데이터의 CRLF 전용 고정 해시 → JSON만LF정규화 후 Git 원본 해시와 대조. 음악·음성 바이트 비교는 그대로다.
+- TR01: 지속 타겟 뒤0.5초 여백의1µs 허용 경계 → 부동소수 잡음 허용만1ns로 축소해 정확한0.5초 정책 유지.
+- TR02: 성공도 무조건0.45초 기다리면 끝박자와 효과가 어긋남 → 조건을 채운 성공은 종료 시각에 확정, 미완료만 늦은 입력을 기다린다.
+- 브라우저 Vorbis duration은144초 곡에서144.002902초였다. 실제 Ogg granule/전체 디코드 길이는 별도 엄격 검사하며 UI 메타 검사는20ms 코덱 여유로 분리한다.
 
 ## 수정 확인된 문제
 

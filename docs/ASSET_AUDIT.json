@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-09-27T08:43:53.309Z",
-  "runtimeFiles": 78,
-  "runtimeBytes": 38452834,
+  "checkedAt": "2026-09-27T09:10:23.675Z",
+  "runtimeFiles": 99,
+  "runtimeBytes": 52938273,
   "missing": [],
   "duplicates": [],
   "voiceErrors": [],
@@ -279,6 +279,76 @@
       "sha256": "b2e887e1d3ae676425d9959894019faf5b501fd34dc3d6af1594a950f2374aca"
     },
     {
+      "file": "public/audio/maru-step-80.ogg",
+      "bytes": 1741422,
+      "sha256": "23993c1992b7c390b6f2865d798a5f0561d0f7cc8339c692b52d992b75a0f4f1"
+    },
+    {
+      "file": "public/audio/maru-step-80.json",
+      "bytes": 4923,
+      "sha256": "275302611118002af81a1180c64d5df0945bd9f86c25426e5ea279fed061e049"
+    },
+    {
+      "file": "public/audio/maru-step-90.ogg",
+      "bytes": 1788016,
+      "sha256": "99a76ece1922f423008f34bf3240a2348db0b11cca35b791c3e2d993f13e9c47"
+    },
+    {
+      "file": "public/audio/maru-step-90.json",
+      "bytes": 5082,
+      "sha256": "cfd9cd3ca3893a57f284ee22b072efc8871b11f3513124d3c8b6003902c361e9"
+    },
+    {
+      "file": "public/audio/maru-step-100.ogg",
+      "bytes": 2057305,
+      "sha256": "cce3ad5579550dbbdacbdd173ce1f6c424bdc0383e122ae31c04ed9a1368a875"
+    },
+    {
+      "file": "public/audio/maru-step-100.json",
+      "bytes": 4933,
+      "sha256": "5f02d6f7815fbc5bbf66a9bfa2d8a37263495c44ad99eae88b16efddba3e013d"
+    },
+    {
+      "file": "public/audio/maru-step-110.ogg",
+      "bytes": 2125654,
+      "sha256": "428a2ecec4abec8e69c6586a0367b93ce7ee8500ebb36963adecd7bbe968d428"
+    },
+    {
+      "file": "public/audio/maru-step-110.json",
+      "bytes": 5124,
+      "sha256": "d47066790b20427b8f896a3e9acdf8c9e72aee40b2592b4f3760ee41c8f15ce9"
+    },
+    {
+      "file": "public/audio/maru-step-120.ogg",
+      "bytes": 2114078,
+      "sha256": "c626c155d1a184eb483246647eb2b881e158d45a1cb286a399623cd4f38af139"
+    },
+    {
+      "file": "public/audio/maru-step-120.json",
+      "bytes": 4925,
+      "sha256": "971b0eea60993bde6abf83529103eb65efef4ae571d7612100f8cf62ecabace1"
+    },
+    {
+      "file": "public/audio/maru-step-130.ogg",
+      "bytes": 2196042,
+      "sha256": "a8c9d450caf56974124c20fb4091495ffdfe65b96cef3d5e25140532d4480964"
+    },
+    {
+      "file": "public/audio/maru-step-130.json",
+      "bytes": 5122,
+      "sha256": "855b79e518bb3d920a42d3d7113af5d8c847a1129db8dd128d66bb6ab57d83a3"
+    },
+    {
+      "file": "public/audio/maru-step-140.ogg",
+      "bytes": 2279161,
+      "sha256": "9012cb8fdca0ac32aed8feb0b68e91054471bc86329ac16bdc6003ca091448ef"
+    },
+    {
+      "file": "public/audio/maru-step-140.json",
+      "bytes": 5082,
+      "sha256": "d217f2c2da5a6e4bc2c84d1e4c26589b4c1930c3c9046c29d45c30d7bb444c0f"
+    },
+    {
       "file": "public/models/pose_landmarker_lite.task",
       "bytes": 5777746,
       "sha256": "59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a"
@@ -290,13 +360,13 @@
     },
     {
       "file": "public/index.html",
-      "bytes": 12251,
-      "sha256": "1fec4e748a6ce3690cb9ec5aa502d9bea464db797fd7cf322a646ed015288fff"
+      "bytes": 13543,
+      "sha256": "2d83d3ec6d95f5080080d9ab38f81e2956ac4fe14557e16e5a6e0f6c3dd1c541"
     },
     {
       "file": "public/style.css",
-      "bytes": 12984,
-      "sha256": "e911ea9ac4550976e77c79180bfbf892785d276091abb0761fb3bf843c25c82e"
+      "bytes": 13202,
+      "sha256": "6c72f5b23bcad06f57577cc56eda0d19cdebdde4bc5ad8e905b368fe6f50af0c"
     },
     {
       "file": "public/saber-editor.css",
@@ -319,14 +389,49 @@
       "sha256": "2f92bcdf7e40ffb9d81b2e414a28370d95619a210079c1bc937dcd4c797ed5f1"
     },
     {
+      "file": "public/charts/maru-step-80.saber.json",
+      "bytes": 13230,
+      "sha256": "ed57d7a11135c76d8cdaef9c009595fbaa59f4039992a04a44e7f80ed5f27ed5"
+    },
+    {
+      "file": "public/charts/maru-step-90.saber.json",
+      "bytes": 16230,
+      "sha256": "59ed6c6ee29c5201c7217e255f6c3810a7411068c1d44f6a4912a314e1906325"
+    },
+    {
+      "file": "public/charts/maru-step-100.saber.json",
+      "bytes": 18151,
+      "sha256": "72755095e2ab500790339cc1082991b98d483e41e956cc34920b6d33aee99fe3"
+    },
+    {
+      "file": "public/charts/maru-step-110.saber.json",
+      "bytes": 20009,
+      "sha256": "fc833e4ef5c051054fe65167cf8a030d3290c04680a0c3bde50ee8450a8c411c"
+    },
+    {
+      "file": "public/charts/maru-step-120.saber.json",
+      "bytes": 21268,
+      "sha256": "b01a3101a2afdc1d1ad0e96f130a5a11dfda646c07fbbe7f1485933a803a5fd6"
+    },
+    {
+      "file": "public/charts/maru-step-130.saber.json",
+      "bytes": 23508,
+      "sha256": "0c3a34c3eda8f85daaf1bf6a6a78ddcd9e9b22357f4253eff00d14d9139d8f40"
+    },
+    {
+      "file": "public/charts/maru-step-140.saber.json",
+      "bytes": 25954,
+      "sha256": "cd4b3f465288029624f4f2f50a3e02e9d9206bf6eec6a8c2f5a2f0110f30c4b0"
+    },
+    {
       "file": "src/core.mjs",
       "bytes": 6818,
       "sha256": "1fd29ee1f8367f53b5499b5d06a5f1d83d30140fa4861f59c3032cb0f99b1d6c"
     },
     {
       "file": "src/app.mjs",
-      "bytes": 41886,
-      "sha256": "602d588c7a85c50cef2078ae149852bda54399eb931eae15a16dc02c90c2467e"
+      "bytes": 42353,
+      "sha256": "5c6a615548943046d1a2041fbe33942c890399dab41f5b9d6e240761816900bd"
     },
     {
       "file": "src/routine.mjs",
@@ -360,8 +465,8 @@
     },
     {
       "file": "src/saber-chart.mjs",
-      "bytes": 4847,
-      "sha256": "3a471876c3256a0f651d49a72c7b3db3bc50d35a89bf5be15ee03429488eef6f"
+      "bytes": 7762,
+      "sha256": "e77461580ece664b4cd4948b050edad2cf41f56386c695e4389a62709f031733"
     },
     {
       "file": "src/saber-input.mjs",
@@ -370,28 +475,28 @@
     },
     {
       "file": "src/saber-core.mjs",
-      "bytes": 5818,
-      "sha256": "02226dabc2212d9362bd71ce8140a9b7364c0a9bd929fd3057581c396c77be6a"
+      "bytes": 8108,
+      "sha256": "a2a4b14aa252530ec9bfa763f5901565e106006abe8ae18ca9d4f291e9210ed6"
     },
     {
       "file": "src/saber-render.mjs",
-      "bytes": 22427,
-      "sha256": "81db029dacae8dec0b4649d38010f84602fb7cdd7e7b4747f32f8f6ee362e5db"
+      "bytes": 23725,
+      "sha256": "10fa10e3429ef091847e5cbb6ca6cfaf4d5f6d7ee9ecda5c5bdf6375531cc2d7"
     },
     {
       "file": "src/saber-game.mjs",
-      "bytes": 9148,
-      "sha256": "43a02c73e24a7ac156c4e345dec8fff2ec16e7de772d86462bcd3136b9c979c8"
+      "bytes": 9585,
+      "sha256": "f1224b6d659a3a2431416874de9c158a84730411dfaff7098d3701ce7c549a1e"
     },
     {
       "file": "src/saber-editor.mjs",
-      "bytes": 16645,
-      "sha256": "7ad9ae07df27cd0aca47a98bb7320eaec142b0c9adb89c2df4ef82ae1c4a90bc"
+      "bytes": 17554,
+      "sha256": "a6e011ff3ea8c618652e79bcd20c46f77a7542aab981ab00bfd1abf1ef4a9c25"
     },
     {
       "file": "src/songs.mjs",
-      "bytes": 667,
-      "sha256": "630c71032528f928181912e9f387276e5103878396f416b72cdd67576d4aa107"
+      "bytes": 1061,
+      "sha256": "f9e0b58770c3df40027188b8c2e9bb510d5904d1b175b2c2fd41ca05f6d3d894"
     },
     {
       "file": "src/saber-feedback.mjs",

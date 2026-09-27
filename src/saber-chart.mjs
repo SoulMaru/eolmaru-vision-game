@@ -27,9 +27,15 @@ export function validateChart(input,{duration=150,leadSeconds=LEAD_SECONDS,songI
     if(!finite(n.time)||n.time<0||n.time>duration)fail('노트 시간이 노래 범위를 벗어났어요.');
     if(!Number.isInteger(n.lineIndex)||n.lineIndex<0||n.lineIndex>3||!Number.isInteger(n.lineLayer)||n.lineLayer<0||n.lineLayer>2)fail('노트 위치는 4열 × 3층 안이어야 해요.');
     if(!HANDS.includes(n.hand)||!DIRECTIONS.includes(n.cutDirection))fail('노트의 손 또는 방향이 올바르지 않아요.');
+    const kind=n.kind??'tap';
+    if(!['tap','sustain'].includes(kind))fail('타겟 종류는 tap 또는 sustain이어야 해요.');
+    if(kind==='sustain'&&(!finite(n.durationSeconds)||n.durationSeconds<.5||n.durationSeconds>6||n.cutDirection!=='any'))fail('지속 타겟은 자유 방향, 0.5~6초로 만들어 주세요.');
+    if(kind==='tap'&&n.durationSeconds!==undefined)fail('한 번 베는 타겟에는 지속 시간이 필요하지 않아요.');
     const timeUs=Math.round(n.time*1e6),time=timeUs/1e6,hitTime=time+raw.offsetSeconds,spawnTime=hitTime-leadSeconds;
     if(spawnTime<0||hitTime>duration-1||hitTime<0)fail('첫 노트의 접근 시간 또는 곡 끝 1초 여백이 부족해요.');
-    return Object.freeze({id:n.id,time,timeUs,hitTime,spawnTime,lineIndex:n.lineIndex,lineLayer:n.lineLayer,hand:n.hand,cutDirection:n.cutDirection});
+    const extra=kind==='sustain'?{kind,durationSeconds:n.durationSeconds,endTime:hitTime+n.durationSeconds}:{};
+    if(extra.endTime>duration-1)fail('지속 타겟이 끝난 뒤 곡 끝까지 1초 여백이 필요해요.');
+    return Object.freeze({id:n.id,time,timeUs,hitTime,spawnTime,lineIndex:n.lineIndex,lineLayer:n.lineLayer,hand:n.hand,cutDirection:n.cutDirection,...extra});
   }).sort((a,b)=>a.timeUs-b.timeUs||a.id.localeCompare(b.id));
   let previous=null,group=[];
   for(const n of notes) {
@@ -39,6 +45,13 @@ export function validateChart(input,{duration=150,leadSeconds=LEAD_SECONDS,songI
     }
     if(group.length>=2||group.some(other=>other.hand===n.hand||(other.lineIndex===n.lineIndex&&other.lineLayer===n.lineLayer)))fail('동시 노트는 서로 다른 손과 위치의 두 개까지 가능해요.');
     group.push(n);
+  }
+  for(let i=0;i<notes.length;i++)if(notes[i].kind==='sustain'){
+    const hold=notes[i];
+    for(let j=i+1;j<notes.length&&notes[j].hitTime<hold.endTime+.5-1e-9;j++){
+      const n=notes[j];
+      if(n.hand===hold.hand||(n.lineIndex===hold.lineIndex&&n.lineLayer===hold.lineLayer))fail('지속 타겟이 끝나고 0.5초 뒤에 같은 손·칸의 다음 타겟을 놓아 주세요.');
+    }
   }
   return Object.freeze({schemaVersion:1,songId:raw.songId,bpm:raw.bpm,offsetSeconds:raw.offsetSeconds,leadSeconds,duration,notes:Object.freeze(notes)});
 }
@@ -59,9 +72,42 @@ export function generateEasyChart({bpm=112,duration=150,offsetSeconds=0,songId='
 }
 
 export function chartJSON(chart) {
-  return {schemaVersion:1,songId:chart.songId,bpm:chart.bpm,offsetSeconds:chart.offsetSeconds,notes:chart.notes.map(({id,time,lineIndex,lineLayer,hand,cutDirection})=>({id,time,lineIndex,lineLayer,hand,cutDirection}))};
+  return {schemaVersion:1,songId:chart.songId,bpm:chart.bpm,offsetSeconds:chart.offsetSeconds,notes:chart.notes.map(({id,time,lineIndex,lineLayer,hand,cutDirection,kind,durationSeconds})=>({id,time,lineIndex,lineLayer,hand,cutDirection,...(kind==='sustain'?{kind,durationSeconds}:{})}))};
 }
 
 export function visibleNotes(chart,states,time) {
-  return chart.notes.filter(n=>n.spawnTime<=time&&n.hitTime+.25>=time&&(!states?.has(n.id)));
+  return chart.notes.filter(n=>n.spawnTime<=time&&(n.endTime??n.hitTime)+.25>=time&&(!states?.has(n.id)));
+}
+
+/** Original training arrangement. Every phrase teaches taps, then a sustained sweep. */
+export function generateTrainingChart(options={}){
+  const easy=generateEasyChart(options),beat=60/easy.bpm,notes=[];
+  let group=0,lastTime=null,blockedUntil=-Infinity;
+  for(const source of easy.notes){
+    if(source.time!==lastTime){lastTime=source.time;group++;}
+    if(source.hitTime<blockedUntil-1e-6)continue;
+    const n=chartJSON({...easy,notes:[source]}).notes[0];
+    if(group%12===5){
+      const durationSeconds=(Math.floor(group/12)%2?4:2)*beat;
+      if(source.hitTime+durationSeconds<=easy.duration-1){
+        const hand=Math.floor(group/12)%2?'right':'left';
+        Object.assign(n,{kind:'sustain',cutDirection:'any',durationSeconds,hand,lineIndex:hand==='left'?1:2});
+        blockedUntil=source.hitTime+durationSeconds+.5;
+      }
+    }
+    notes.push(n);
+  }
+  return validateChart({...chartJSON(easy),notes},{duration:easy.duration,songId:easy.songId,leadSeconds:easy.leadSeconds});
+}
+
+/** Display/practice settings never rewrite the source chart or change its music clock. */
+export function applyTrainingSettings(chart,{approachSpeed=1,spacingBeats=2}={}){
+  if(!finite(approachSpeed)||approachSpeed<.6||approachSpeed>1.6||![2,4].includes(spacingBeats))fail('접근 속도는 0.6~1.6배, 등장 간격은 2박 또는 4박이에요.');
+  const leadSeconds=LEAD_SECONDS/approachSpeed;
+  let group=-1,previous=null;
+  const notes=chart.notes.filter(n=>{
+    if(n.timeUs!==previous){group++;previous=n.timeUs;}
+    return spacingBeats===2||group%2===0;
+  }).map(n=>Object.freeze({...n,spawnTime:Math.max(0,n.hitTime-leadSeconds)}));
+  return Object.freeze({...chart,leadSeconds,approachSpeed,spacingBeats,notes:Object.freeze(notes)});
 }

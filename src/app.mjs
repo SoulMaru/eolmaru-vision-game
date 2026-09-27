@@ -35,7 +35,12 @@ const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
 const fullscreen=new FullscreenController({onExit:()=>{pauseGame();notice('전체화면을 나와 잠시 멈췄어요. 왼쪽 계속하기로 이어가세요.');},onChange:(active,message)=>{$('fullscreen-toggle').textContent=active?'⛶ 전체화면 나가기':'⛶ 전체화면';$('fullscreen-status').textContent=message;document.body.classList.toggle('native-fullscreen',active);}});
 $('fullscreen-toggle').onclick=()=>fullscreen.toggle();
 let track={...BUILTIN_SONGS[0]},localSongUrl=null,songLoading=false,chartLoading=false,chartRevision=0;
-for(const song of BUILTIN_SONGS.slice(1))$('song-select').insertBefore(new Option(`${song.title} · ${song.genre} ${song.bpm} BPM`,song.value),$('song-select').querySelector('option[value="local"]'));
+const trainingGroup=document.createElement('optgroup');trainingGroup.label='템포 적응 · 80 → 140 BPM';
+$('song-select').insertBefore(trainingGroup,$('song-select').querySelector('option[value="builtin"]'));
+for(const song of BUILTIN_SONGS.slice(1)){
+  const option=new Option(song.training?`${song.bpm} BPM · ${song.title}`:`${song.title} · ${song.genre} ${song.bpm} BPM`,song.value);
+  if(song.training)trainingGroup.append(option);else $('song-select').insertBefore(option,$('song-select').querySelector('option[value="local"]'));
+}
 const selectedSongChoice=()=>localSongUrl?'local':track.value;
 let segmentIndex=0;
 const profile=()=>ROUTINE_PROFILES[state.profile];
@@ -45,15 +50,16 @@ const sessionTime=()=>state.mode==='stretch'?segmentIndex*75+Math.min(audio.curr
 const selectedAudio=()=>state.mode==='stretch'?SET_TRACKS[segmentIndex].src:localSongUrl||track.src;
 let stream=null,landmarker=null,starting=false,visionImport=null,delegate='GPU',lastInference=0,lastVideoTime=-1,lastDetection=0,inferMs=0,inferFPS=0,lastUI=0,lastStretchTime=null,stopGeneration=0,gameGeneration=0,lastRender=performance.now();
 let saved={};try{saved=JSON.parse(localStorage.getItem('eolmaru.settings')||'{}');}catch{}
-const settingIds=['quality','volume','voice-enabled','voice-volume','praise-volume','saber-latency','saber-range','saber-effects','hit-volume'];
+const settingIds=['quality','volume','voice-enabled','voice-volume','praise-volume','saber-latency','saber-range','saber-effects','hit-volume','target-speed','target-spacing'];
 for(const id of settingIds) if(saved[id]!==undefined) $(id).value=saved[id];
+if(!['2','4'].includes($('target-spacing').value))$('target-spacing').value='2';
 audio.volume=Number($('volume').value)/100;
 const config=()=>({fps:Number($('quality').value)||12});
 const notice=text=>$('notice').textContent=text;
 const clock=t=>`${String(Math.floor(t/60)).padStart(2,'0')}:${String(Math.floor(t%60)).padStart(2,'0')}`;
 const aspect=()=>camera.videoWidth&&camera.videoHeight?camera.videoWidth/camera.videoHeight:4/3;
 const active=()=>['playing','paused','countdown','preparing','starting','resuming','transition'].includes(state.phase);
-const saber=new SaberGame({stage,audio,phase:()=>state.phase,players:()=>state.players,input:()=>state.mode==='rhythm'?state.input:null,notice,onHit:event=>feedback.hit(event),onReset:()=>feedback.stop(),latency:()=>clamp(Number($('saber-latency').value)/1000,-.25,.25),range:()=>Number($('saber-range').value)||1,quality:()=>$('saber-effects').value});
+const saber=new SaberGame({stage,audio,phase:()=>state.phase,players:()=>state.players,input:()=>state.mode==='rhythm'?state.input:null,notice,onHit:event=>feedback.hit(event),onReset:()=>feedback.stop(),latency:()=>clamp(Number($('saber-latency').value)/1000,-.25,.25),range:()=>Number($('saber-range').value)||1,quality:()=>$('saber-effects').value,trainingSettings:()=>({approachSpeed:Number($('target-speed').value)||1,spacingBeats:Number($('target-spacing').value)||2})});
 const editor=createChartEditor({onApply:chart=>{if(active())return;chartRevision++;saber.setChart(chart);track.bpm=chart.bpm;updateSong();notice('편집한 채보를 이번 노래에 적용했어요.');},onNotice:notice});
 const builtinCharts=new Map();
 for(const song of BUILTIN_SONGS)fetch(song.chart).then(r=>{if(!r.ok)throw Error('chart');return r.json();}).then(raw=>{
@@ -76,6 +82,7 @@ $('chart-file').onchange=async()=>{
 };
 
 function saveSettings(){
+  $('target-speed-value').textContent=`${Number($('target-speed').value).toFixed(1)}×`;
   $('saber-latency-value').textContent=`${$('saber-latency').value} ms`;$('volume-value').textContent=`${$('volume').value}%`;
   $('voice-volume-value').textContent=`${$('voice-volume').value}%`;coach.volume=Number($('voice-volume').value)/100;
   $('praise-volume-value').textContent=`${$('praise-volume').value}%`;
@@ -85,6 +92,7 @@ function saveSettings(){
   try{localStorage.setItem('eolmaru.settings',JSON.stringify(settings));}catch{}
 }
 for(const id of settingIds) $(id).addEventListener('input',saveSettings);
+for(const id of ['target-speed','target-spacing'])$(id).addEventListener('change',()=>{if(!active())saber.configure();});
 saveSettings();
 $('settings-open').onclick=()=>{if(active())pauseGame();$('settings-dialog').showModal();};$('help-open').onclick=()=>{if(active())pauseGame();$('help-dialog').showModal();};
 
@@ -103,6 +111,7 @@ function updateControls(){
   $('camera-stop').hidden=!stream;$('p2-score').hidden=state.players!==2;
   $('input-badge').textContent=state.input==='camera'?'CAMERA · LOCAL':state.input==='keyboard'?(state.mode==='stretch'?'GUIDE · 안내':'KEYBOARD · 체험'):'입력 대기';
   $('saber-tools').hidden=state.mode!=='rhythm';$('saber-calibrate').disabled=locked||state.input!=='camera';
+  $('target-speed').disabled=$('target-spacing').disabled=locked||songLoading||chartLoading;
   $('editor-open').disabled=locked||songLoading||chartLoading;$('chart-import').disabled=locked||songLoading||chartLoading;
   $('saber-player').querySelector('option[value="1"]').disabled=state.players<2;
   $('stage-message').hidden=state.phase!=='idle'||state.mode==='rhythm';
@@ -274,7 +283,7 @@ function finishGame(){
   if(state.phase==='results')return;
   audio.pause();rhythmAudio.stop();state.phase='results';fullscreen.exit();speak('finish');$('countdown').hidden=true;
   const saberResults=state.mode==='rhythm'?saber.finish():null;
-  state.lastResult={version:'0.5.0',timestamp:new Date().toISOString(),mode:state.mode,profile:state.mode==='stretch'?state.profile:null,input:state.input,duration:Math.min(sessionTime(),sessionDuration()),players:state.players,track:state.mode==='stretch'?profile().name:track.title,elimination:false,results:Array.from({length:state.players},(_,i)=>state.mode==='rhythm'?{...saberResults[i],matched:saberResults[i].hit}: {similarity:state.stretch[i].samples?Math.round(state.stretch[i].sum/state.stretch[i].samples):null,matchedSeconds:Math.round(state.stretch[i].hold),observedFrames:state.stretch[i].samples})};
+  state.lastResult={version:'0.6.0',timestamp:new Date().toISOString(),mode:state.mode,profile:state.mode==='stretch'?state.profile:null,input:state.input,duration:Math.min(sessionTime(),sessionDuration()),players:state.players,track:state.mode==='stretch'?profile().name:track.title,elimination:false,results:Array.from({length:state.players},(_,i)=>state.mode==='rhythm'?{...saberResults[i],matched:saberResults[i].hit}: {similarity:state.stretch[i].samples?Math.round(state.stretch[i].sum/state.stretch[i].samples):null,matchedSeconds:Math.round(state.stretch[i].hold),observedFrames:state.stretch[i].samples})};
   $('result-dialog').querySelector('h2').textContent=state.mode==='stretch'?'한 세트의 안내를 마쳤어요.':'한 곡을 마쳤어요.';
   $('result-subtitle').textContent=state.mode==='stretch'?`${profile().name} · 3분 45초 안내 완료. 동작 수행 여부나 운동 효과를 자동 확인한 것은 아니에요.`:`${track.title} · ${clock(track.duration)} · 편안하게 마무리하세요.`;
   $('result-cards').replaceChildren();

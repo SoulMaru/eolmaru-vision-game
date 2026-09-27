@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {SET_TRACKS,SET_DURATION} from '../src/routine.mjs';
 import {BUILTIN_SONGS,getBuiltinSong} from '../src/songs.mjs';
-import {validateChart,generateEasyChart,chartJSON,visibleNotes} from '../src/saber-chart.mjs';
+import {validateChart,generateEasyChart,generateTrainingChart,chartJSON,visibleNotes} from '../src/saber-chart.mjs';
 import {SaberSession} from '../src/saber-core.mjs';
 
 const publicFile=path=>readFileSync(new URL(`../public/${path}`,import.meta.url));
@@ -33,19 +33,24 @@ function vorbisFormat(bytes){
 }
 // Independently captured before music work, at HEAD 8e7971c. Do not regenerate
 // these expectations from changed metadata: the test protects original music.
+// JSON hashes use the committed LF form so CRLF worktrees and fresh LF clones
+// agree; the audio bytes are never normalized (training review TR00).
 // Voice replacement is explicitly authorized by the later feedback update;
 // its current manifest/assets are checked by profile/feedback tests instead.
 const ORIGINAL_HASHES={
   'audio/maru-flow.ogg':'a940becf5467a95501eed896ac1b860cc90c764239ed18ed2eac5c7090d79cb3',
-  'audio/maru-flow.json':'f02131e0119dc53ce70e40c06e16ad9971e5419ed08dbdb091362396a8422bae',
+  'audio/maru-flow.json':'81f21fd36017d200627f3eafa4428084d2ece99c3c8ce60c33f7b4f092693721',
   'audio/maru-breeze.ogg':'55e0d152805249f29f2fb3f399a6478e8e2f9d97977eb79a43f4000bdcbc13b1',
-  'audio/maru-breeze.json':'1560979b5db0bd6c3c822603156ed9ccf348530e45b2e154ae4eb74def8881f7',
+  'audio/maru-breeze.json':'1273c2ffefb57bebeba9e12723beacc5f3add37bbc5f293ae39de582cacf9baa',
   'audio/maru-sunset.ogg':'2eab0411221a10f2529ded19362709e5f553a8e8da49b1094506ee8be33345d6',
-  'audio/maru-sunset.json':'963830465320d2279fa6d10e3e0eeab841014b5b14d1706b5dc4dad6c95df62b',
+  'audio/maru-sunset.json':'ec9c737b5d6ca5b340014559e7c1ed228c473add07dcf07f7a02c2bbe3216524',
 };
 
-test('dance expansion preserves the three original songs and their metadata byte-for-byte',()=>{
-  for(const [path,expected] of Object.entries(ORIGINAL_HASHES))assert.equal(hash(publicFile(path)),expected,path);
+test('dance expansion preserves the original music bytes and exact metadata after LF normalization',()=>{
+  for(const [path,expected] of Object.entries(ORIGINAL_HASHES)){
+    const bytes=publicFile(path),normalized=path.endsWith('.json')?bytes.toString('utf8').replace(/\r\n/g,'\n'):bytes;
+    assert.equal(hash(normalized),expected,path);
+  }
 });
 
 test('faster rhythm music never changes the existing three-half-song stretching set',()=>{
@@ -81,7 +86,8 @@ test('every supplied rhythm chart uses its own song clock, two-beat groups and f
   for(const song of BUILTIN_SONGS){
     const raw=JSON.parse(publicFile(song.chart.slice(1))),chart=validateChart(raw,{duration:song.duration,songId:song.songId});
     assert.equal(chart.bpm,song.bpm);assert.equal(chart.offsetSeconds,0);
-    assert.deepEqual(chartJSON(generateEasyChart({bpm:song.bpm,duration:song.duration,songId:song.songId})),chartJSON(chart),'cached chart and pre-fetch fallback follow the same timing');
+    const fallback=song.training?generateTrainingChart:generateEasyChart;
+    assert.deepEqual(chartJSON(fallback({bpm:song.bpm,duration:song.duration,songId:song.songId})),chartJSON(chart),'cached chart and pre-fetch fallback follow the same timing');
     let previous=null;
     for(const note of chart.notes){
       assert.ok(note.spawnTime>=0&&note.hitTime<=song.duration-1);

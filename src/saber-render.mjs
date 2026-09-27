@@ -173,20 +173,38 @@ function noteBlock(c,x,y,size,hand,direction,alpha,low,late=false) {
   c.restore();
 }
 
-function drawNotes(c,r,notes,time,low) {
+function sustainBlock(c,x,y,size,n,time,low){
+  const p=PALETTE[n.hand]??PALETTE.left,active=time>=n.hitTime,progress=clamp(n.sustainProgress??0,0,1);
+  c.save();
+  if(!low){c.shadowColor=p.glow;c.shadowBlur=Math.min(18,size*.15);}
+  rounded(c,x-size/2,y-size/2,size,size,size*.2,active?'#132e49f2':'#182741df',p.edge,Math.max(2,size*.035));c.shadowBlur=0;
+  c.strokeStyle=p.glow;c.lineWidth=Math.max(2,size*.035);
+  c.beginPath();c.arc(x,y-size*.07,size*.28,-Math.PI/2,-Math.PI/2+Math.PI*2*clamp((time-n.hitTime)/n.durationSeconds,0,1));c.stroke();
+  text(c,'∞',x,y+size*.03,size*.40,p.edge,'center',800);
+  if(size>32){
+    text(c,`${p.name} · 계속 베기`,x,y-size*.33,Math.max(7,size*.11),'#f1fbff','center');
+    text(c,`${Math.max(0,active?n.endTime-time:n.durationSeconds).toFixed(1)}초`,x,y+size*.30,Math.max(8,size*.13),'#d6ecff','center');
+  }
+  rounded(c,x-size*.35,y+size*.39,size*.7,size*.045,size*.02,'#50617c');
+  if(progress>0)rounded(c,x-size*.35,y+size*.39,size*.7*Math.min(1,progress/.6),size*.045,size*.02,'#a6ffd7');
+  c.restore();
+}
+
+function drawNotes(c,r,notes,time,low,leadSeconds) {
   const vx=r.x+r.w*.5,vy=r.y+r.h*.38;
   // Caller supplies active pending notes. Bound the work even for malformed integrations.
   const visible=notes.slice(0,MAX_NOTES).filter(n=>finite(n.hitTime)&&finite(n.lineIndex)&&finite(n.lineLayer)
     &&n.lineIndex>=0&&n.lineIndex<4&&n.lineLayer>=0&&n.lineLayer<3
-    &&time>=(finite(n.spawnTime)?n.spawnTime:n.hitTime-1.8)&&time<=n.hitTime+.30);
+    &&time>=(finite(n.spawnTime)?n.spawnTime:n.hitTime-1.8)&&time<=(n.endTime??n.hitTime)+.30);
   visible.sort((a,b)=>b.hitTime-a.hitTime);
   for(const n of visible) {
-    const delta=n.hitTime-time,scale=1/(1+Math.max(-.12,delta)*2.4);
+    const delta=n.hitTime-time,scale=1/(1+Math.max(n.kind==='sustain'?0:-.12,delta)*2.4*1.8/leadSeconds);
     const targetX=r.x+(n.lineIndex+.5)*r.cell,targetY=r.y+(n.lineLayer+.5)*r.cell;
     const x=vx+(targetX-vx)*scale,y=vy+(targetY-vy)*scale;
     const late=delta<-.05,alpha=delta<0?clamp(1+delta/.3,.12,1):clamp(.42+scale*.58,.4,1);
     // Exact size at delta=0 is .72 cell, equal to the collision rectangle contract.
-    noteBlock(c,x,y,r.cell*.72*scale,n.hand,n.cutDirection,alpha,low,late);
+    if(n.kind==='sustain')sustainBlock(c,x,y,r.cell*1.1*scale,n,time,low);
+    else noteBlock(c,x,y,r.cell*.72*scale,n.hand,n.cutDirection,alpha,low,late);
     if(delta>=0&&delta<.3) {
       c.save();c.globalAlpha=(1-delta/.3)*.38;
       rounded(c,targetX-r.cell*.4,targetY-r.cell*.4,r.cell*.8,r.cell*.8,r.cell*.09,null,PALETTE[n.hand]?.edge??'#fff',1);
@@ -365,10 +383,11 @@ function drawGradeLabel(c,r,e,time,reduced,low) {
 }
 
 /** Main render; no clock, DOM, browser global, mutation, or external resources. */
-export function drawSaber(c,w,h,{time=0,bpm=112,slots=[],phase='idle',effects=[],reduced=false,quality='high',selected={player:0,hand:'left'}}={}) {
+export function drawSaber(c,w,h,{time=0,bpm=112,leadSeconds=1.8,slots=[],phase='idle',effects=[],reduced=false,quality='high',selected={player:0,hand:'left'}}={}) {
   if(!c||!finite(w)||!finite(h)||w<=0||h<=0)return;
   const players=slots.length===2?2:1,low=quality==='low';
   time=finite(time)?time:0;
+  leadSeconds=finite(leadSeconds)&&leadSeconds>0?leadSeconds:1.8;
   c.save();c.globalAlpha=1;c.lineCap='butt';c.setLineDash([]);
   const pulse=atmosphere(c,w,h,time,bpm,reduced,low);
   const compact=w<600,headerSize=compact?10:13;
@@ -383,7 +402,7 @@ export function drawSaber(c,w,h,{time=0,bpm=112,slots=[],phase='idle',effects=[]
     text(c,`P${player+1}`,left+Math.max(10,section*.027),py,small?9:11,player===0?'#c5b9ff':'#9cdef0','left',800);
     const status=slot.status || (phase==='idle'?'양손을 편안하게 준비해요':phase==='paused'?'일시정지':'음악에 맞춰 화살표 방향으로');
     if(!tiny)fitText(c,status,left+section*.5,py,section*.70,small?8:10,'#a5b8d3','center');
-    drawNotes(c,r,Array.isArray(slot.notes)?slot.notes:[],time,low);
+    drawNotes(c,r,Array.isArray(slot.notes)?slot.notes:[],time,low,leadSeconds);
     const visibleEffects=effects.slice(-(reduced?4:low?8:MAX_EFFECTS));
     for(const e of visibleEffects)if(e.player===player)drawEffect(c,r,e,time,reduced,low);
     for(const handName of ['left','right'])drawHand(c,r,slot.hands?.[handName],handName,time,selected?.player===player&&selected?.hand===handName,low,reduced);

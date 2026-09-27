@@ -13,7 +13,7 @@
   const {gridToStage}=await import('/src/saber-render.mjs');
   $('players').value='2';$('players').dispatchEvent(new Event('change'));
   check('three rhythm originals plus a local-file option',BUILTIN_SONGS.every(s=>$('song-select').querySelector(`option[value="${s.value}"]`))&&!!$('song-select').querySelector('option[value="local"]'));
-  for(const song of BUILTIN_SONGS.slice(1)){
+  for(const song of BUILTIN_SONGS.filter(s=>!s.training).slice(1)){
     choose(song.value);await until(()=>$('music').readyState>=1&&$('music').currentSrc.endsWith(song.src));
     check(`${song.songId}: metadata duration matches actual Ogg`,Math.abs($('music').duration-song.duration)<.02);
     check(`${song.songId}: genre, BPM, title and clock update`,$('song-title').textContent===song.title&&$('song-description').textContent.includes(String(song.bpm))&&$('song-description').textContent.includes(song.genre)&&Math.abs($('progress').max-song.duration)<.001);

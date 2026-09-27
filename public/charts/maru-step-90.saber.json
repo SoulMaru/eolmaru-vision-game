@@ -1,0 +1,850 @@
+{
+  "schemaVersion": 1,
+  "songId": "maru-step-90",
+  "bpm": 90,
+  "offsetSeconds": 0,
+  "notes": [
+    {
+      "id": "n1",
+      "time": 5.333333,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n2",
+      "time": 6.666667,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n3",
+      "time": 8,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n4",
+      "time": 9.333333,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n5",
+      "time": 10.666667,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "any",
+      "kind": "sustain",
+      "durationSeconds": 1.3333333333333333
+    },
+    {
+      "id": "n7",
+      "time": 13.333333,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n8",
+      "time": 14.666667,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n9",
+      "time": 16,
+      "lineIndex": 1,
+      "lineLayer": 0,
+      "hand": "left",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n10",
+      "time": 17.333333,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n11",
+      "time": 18.666667,
+      "lineIndex": 1,
+      "lineLayer": 0,
+      "hand": "left",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n12",
+      "time": 20,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n13",
+      "time": 21.333333,
+      "lineIndex": 1,
+      "lineLayer": 2,
+      "hand": "left",
+      "cutDirection": "left"
+    },
+    {
+      "id": "n14",
+      "time": 21.333333,
+      "lineIndex": 2,
+      "lineLayer": 2,
+      "hand": "right",
+      "cutDirection": "right"
+    },
+    {
+      "id": "n15",
+      "time": 22.666667,
+      "lineIndex": 2,
+      "lineLayer": 2,
+      "hand": "right",
+      "cutDirection": "right"
+    },
+    {
+      "id": "n16",
+      "time": 24,
+      "lineIndex": 1,
+      "lineLayer": 2,
+      "hand": "left",
+      "cutDirection": "left"
+    },
+    {
+      "id": "n17",
+      "time": 25.333333,
+      "lineIndex": 2,
+      "lineLayer": 2,
+      "hand": "right",
+      "cutDirection": "right"
+    },
+    {
+      "id": "n18",
+      "time": 26.666667,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "any",
+      "kind": "sustain",
+      "durationSeconds": 2.6666666666666665
+    },
+    {
+      "id": "n21",
+      "time": 30.666667,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n22",
+      "time": 32,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n23",
+      "time": 33.333333,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n24",
+      "time": 34.666667,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n25",
+      "time": 36,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n26",
+      "time": 37.333333,
+      "lineIndex": 1,
+      "lineLayer": 0,
+      "hand": "left",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n27",
+      "time": 37.333333,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n28",
+      "time": 38.666667,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n29",
+      "time": 40,
+      "lineIndex": 1,
+      "lineLayer": 0,
+      "hand": "left",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n30",
+      "time": 41.333333,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n31",
+      "time": 42.666667,
+      "lineIndex": 1,
+      "lineLayer": 2,
+      "hand": "left",
+      "cutDirection": "any",
+      "kind": "sustain",
+      "durationSeconds": 1.3333333333333333
+    },
+    {
+      "id": "n33",
+      "time": 45.333333,
+      "lineIndex": 1,
+      "lineLayer": 2,
+      "hand": "left",
+      "cutDirection": "left"
+    },
+    {
+      "id": "n34",
+      "time": 46.666667,
+      "lineIndex": 2,
+      "lineLayer": 2,
+      "hand": "right",
+      "cutDirection": "right"
+    },
+    {
+      "id": "n35",
+      "time": 48,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n36",
+      "time": 49.333333,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n37",
+      "time": 50.666667,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n38",
+      "time": 52,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n39",
+      "time": 53.333333,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n40",
+      "time": 53.333333,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n41",
+      "time": 54.666667,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n42",
+      "time": 56,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n43",
+      "time": 57.333333,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n44",
+      "time": 58.666667,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any",
+      "kind": "sustain",
+      "durationSeconds": 2.6666666666666665
+    },
+    {
+      "id": "n47",
+      "time": 62.666667,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n48",
+      "time": 64,
+      "lineIndex": 1,
+      "lineLayer": 2,
+      "hand": "left",
+      "cutDirection": "left"
+    },
+    {
+      "id": "n49",
+      "time": 65.333333,
+      "lineIndex": 2,
+      "lineLayer": 2,
+      "hand": "right",
+      "cutDirection": "right"
+    },
+    {
+      "id": "n50",
+      "time": 66.666667,
+      "lineIndex": 1,
+      "lineLayer": 2,
+      "hand": "left",
+      "cutDirection": "left"
+    },
+    {
+      "id": "n51",
+      "time": 68,
+      "lineIndex": 2,
+      "lineLayer": 2,
+      "hand": "right",
+      "cutDirection": "right"
+    },
+    {
+      "id": "n52",
+      "time": 69.333333,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n53",
+      "time": 69.333333,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n54",
+      "time": 70.666667,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n55",
+      "time": 72,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n56",
+      "time": 73.333333,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n57",
+      "time": 74.666667,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "any",
+      "kind": "sustain",
+      "durationSeconds": 1.3333333333333333
+    },
+    {
+      "id": "n59",
+      "time": 77.333333,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n60",
+      "time": 78.666667,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n61",
+      "time": 80,
+      "lineIndex": 1,
+      "lineLayer": 0,
+      "hand": "left",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n62",
+      "time": 81.333333,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n63",
+      "time": 82.666667,
+      "lineIndex": 1,
+      "lineLayer": 0,
+      "hand": "left",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n64",
+      "time": 84,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n65",
+      "time": 85.333333,
+      "lineIndex": 1,
+      "lineLayer": 2,
+      "hand": "left",
+      "cutDirection": "left"
+    },
+    {
+      "id": "n66",
+      "time": 85.333333,
+      "lineIndex": 2,
+      "lineLayer": 2,
+      "hand": "right",
+      "cutDirection": "right"
+    },
+    {
+      "id": "n67",
+      "time": 86.666667,
+      "lineIndex": 2,
+      "lineLayer": 2,
+      "hand": "right",
+      "cutDirection": "right"
+    },
+    {
+      "id": "n68",
+      "time": 88,
+      "lineIndex": 1,
+      "lineLayer": 2,
+      "hand": "left",
+      "cutDirection": "left"
+    },
+    {
+      "id": "n69",
+      "time": 89.333333,
+      "lineIndex": 2,
+      "lineLayer": 2,
+      "hand": "right",
+      "cutDirection": "right"
+    },
+    {
+      "id": "n70",
+      "time": 90.666667,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "any",
+      "kind": "sustain",
+      "durationSeconds": 2.6666666666666665
+    },
+    {
+      "id": "n73",
+      "time": 94.666667,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n74",
+      "time": 96,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n75",
+      "time": 97.333333,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n76",
+      "time": 98.666667,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n77",
+      "time": 100,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n78",
+      "time": 101.333333,
+      "lineIndex": 1,
+      "lineLayer": 0,
+      "hand": "left",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n79",
+      "time": 101.333333,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n80",
+      "time": 102.666667,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n81",
+      "time": 104,
+      "lineIndex": 1,
+      "lineLayer": 0,
+      "hand": "left",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n82",
+      "time": 105.333333,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n83",
+      "time": 106.666667,
+      "lineIndex": 1,
+      "lineLayer": 2,
+      "hand": "left",
+      "cutDirection": "any",
+      "kind": "sustain",
+      "durationSeconds": 1.3333333333333333
+    },
+    {
+      "id": "n85",
+      "time": 109.333333,
+      "lineIndex": 1,
+      "lineLayer": 2,
+      "hand": "left",
+      "cutDirection": "left"
+    },
+    {
+      "id": "n86",
+      "time": 110.666667,
+      "lineIndex": 2,
+      "lineLayer": 2,
+      "hand": "right",
+      "cutDirection": "right"
+    },
+    {
+      "id": "n87",
+      "time": 112,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n88",
+      "time": 113.333333,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n89",
+      "time": 114.666667,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n90",
+      "time": 116,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n91",
+      "time": 117.333333,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n92",
+      "time": 117.333333,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n93",
+      "time": 118.666667,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n94",
+      "time": 120,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n95",
+      "time": 121.333333,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n96",
+      "time": 122.666667,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any",
+      "kind": "sustain",
+      "durationSeconds": 2.6666666666666665
+    },
+    {
+      "id": "n99",
+      "time": 126.666667,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n100",
+      "time": 128,
+      "lineIndex": 1,
+      "lineLayer": 2,
+      "hand": "left",
+      "cutDirection": "left"
+    },
+    {
+      "id": "n101",
+      "time": 129.333333,
+      "lineIndex": 2,
+      "lineLayer": 2,
+      "hand": "right",
+      "cutDirection": "right"
+    },
+    {
+      "id": "n102",
+      "time": 130.666667,
+      "lineIndex": 1,
+      "lineLayer": 2,
+      "hand": "left",
+      "cutDirection": "left"
+    },
+    {
+      "id": "n103",
+      "time": 132,
+      "lineIndex": 2,
+      "lineLayer": 2,
+      "hand": "right",
+      "cutDirection": "right"
+    },
+    {
+      "id": "n104",
+      "time": 133.333333,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n105",
+      "time": 133.333333,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n106",
+      "time": 134.666667,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n107",
+      "time": 136,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n108",
+      "time": 137.333333,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "down"
+    },
+    {
+      "id": "n109",
+      "time": 138.666667,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "any",
+      "kind": "sustain",
+      "durationSeconds": 1.3333333333333333
+    },
+    {
+      "id": "n111",
+      "time": 141.333333,
+      "lineIndex": 1,
+      "lineLayer": 1,
+      "hand": "left",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n112",
+      "time": 142.666667,
+      "lineIndex": 2,
+      "lineLayer": 1,
+      "hand": "right",
+      "cutDirection": "up"
+    },
+    {
+      "id": "n113",
+      "time": 144,
+      "lineIndex": 1,
+      "lineLayer": 0,
+      "hand": "left",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n114",
+      "time": 145.333333,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n115",
+      "time": 146.666667,
+      "lineIndex": 1,
+      "lineLayer": 0,
+      "hand": "left",
+      "cutDirection": "any"
+    },
+    {
+      "id": "n116",
+      "time": 148,
+      "lineIndex": 2,
+      "lineLayer": 0,
+      "hand": "right",
+      "cutDirection": "any"
+    }
+  ]
+}
