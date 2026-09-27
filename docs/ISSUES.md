@@ -5,7 +5,7 @@
 | ID | 상황/재현 | 현재 동작 | 다음 검증 / 검색어 |
 |---|---|---|---|
 | H01 | 두 사람이 실제 카메라 양쪽에서 손을 뻗기 | 좌우 고정 슬롯·가운데6% 완충구역 | 1인/2인 완주, 한명퇴장, 교차/가림. `MediaPipe PoseLandmarker numPoses occlusion identity` |
-| H02 | 카메라 가까이 앉거나 발/손이 프레임 밖 | 보이는 신뢰도 있는 상체만 비교; 목/하체 안내 유지 | 의자/카메라 높이/전신 프레이밍. `MediaPipe pose wrist visibility seated partial body` |
+| H02 | 카메라 가까이 앉거나 발/손이 프레임 밖 | 보이는 신뢰도 있는 상체만 비교; 목/하체 안내 유지 | 손 리듬 의자/서기 전신/누운 매트 카메라 구도. `MediaPipe pose wrist visibility standing supine partial body` |
 | H03 | 박자에 맞췄는데 체감상 늦음 | 오디오 시계 기준 ±300ms 보정 제공 | 실제 카메라 지연을 관측한 뒤 기본값 조정. `rhythm game audio input latency calibration` |
 | H04 | 인식마다 화면이 잠깐 끊김 | 기본12Hz, 추론85ms 초과시 최대8Hz, 640px, GPU→CPU fallback | 사람2명 실측 후 필요시 Worker 전환. `MediaPipe Tasks Vision OffscreenCanvas worker wasm module` |
 | H05 | 한국어 안내/음악의 발음·음량 | F 해미 음성·별도 볼륨·음악 ducking | 사람 청취. `Windows SAPI Korean Heami pronunciation` |
@@ -21,6 +21,9 @@
 - R05: 계속하기 버튼 초점에서 방향키 무시 → 버튼에서도 방향 입력 전달, 브라우저 회귀.
 - R06: 완주 후 시간/점수 잔여 → 세션 초기화 통합.
 - R07: 사용자곡 로딩 중 전신모드 전환 → 로딩 중 모드잠금, 완료 후 모드 재확인.
+- R08: 누운 오른쪽 무릎/햄스트링 캐릭터가 왼쪽 공간으로 이동 → 오른쪽 팔다리 좌표 반사 및 독립 기하 회귀.
+- R09: 누운 안내에 0초 함께 표시 → 측정값 없는 시간·음성 안내로 수정.
+- 인원 재설정 중 추론 경쟁 가능성 → setOptions 동안 추론도 중단.
 - 코치 반복 재생 → 동작 구간 index 변경시에만 한 번 안내.
 - 곡 전환 중복 → 즉시 transition 단계잠금 및 현재 audio.ended 확인.
 

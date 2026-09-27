@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-09-27T01:23:39.185Z",
-  "runtimeFiles": 40,
-  "runtimeBytes": 35155213,
+  "checkedAt": "2026-09-27T01:41:01.721Z",
+  "runtimeFiles": 54,
+  "runtimeBytes": 35609680,
   "missing": [],
   "duplicates": [],
   "voiceErrors": [],
@@ -68,11 +68,6 @@
       "sha256": "0a46d8a98222ed7813ce65ce09d626db8473083acfc309e3525a984469fa9d77"
     },
     {
-      "file": "public/audio/voice/up.ogg",
-      "bytes": 15433,
-      "sha256": "7175ffcb6bca2906cc6f5c8a0f983ea03bacdd6869e51e472b96fbe45738134d"
-    },
-    {
       "file": "public/audio/voice/left.ogg",
       "bytes": 17095,
       "sha256": "476f9d62f04c67f11d7562bcfe9f3c6c532c75bf1f7b4701c407249d26f6ea8a"
@@ -99,13 +94,8 @@
     },
     {
       "file": "public/audio/voice/manifest.json",
-      "bytes": 7140,
-      "sha256": "e1e6132d314d4d61ee58ae5c78a189248c64a3c364b61df7c02e3f0f8ea22e0e"
-    },
-    {
-      "file": "public/audio/voice/prepare-body.ogg",
-      "bytes": 22920,
-      "sha256": "7360d90ec86e90ab43cb18224842044611488704b5c20be8a89066adb65773da"
+      "bytes": 12106,
+      "sha256": "3a78a0db9307a43c2c0e77c27760930eea85b0196b10fe27a4ca11bdc83c7e5e"
     },
     {
       "file": "public/audio/voice/neck-left.ogg",
@@ -123,34 +113,104 @@
       "sha256": "2f8688e8ee8d6a625f5344861520554741bd79004aa96a17cf3e0ddf4f64463b"
     },
     {
-      "file": "public/audio/voice/march.ogg",
-      "bytes": 20704,
-      "sha256": "3a191a7deea9cc3b3218a87b5b0ca5eed27b85fb08ce1463158c265dd8e1d8b3"
-    },
-    {
-      "file": "public/audio/voice/hamstring-left.ogg",
-      "bytes": 27716,
-      "sha256": "1c607d4a49f6f0668f9ede1ab45473a94969e7f0e72a394f41726f3e3b0a151a"
-    },
-    {
-      "file": "public/audio/voice/hamstring-right.ogg",
-      "bytes": 28216,
-      "sha256": "4a010c80c9a108d8dbae5ce64e8c2449b28605892c83e85fe5aa786ac8f0d5a1"
-    },
-    {
-      "file": "public/audio/voice/calf-left.ogg",
-      "bytes": 25027,
-      "sha256": "0f5766402f134a85a7a638f6f2fa77959530d2455ae95d72e9a117cdaf5d0abd"
-    },
-    {
-      "file": "public/audio/voice/calf-right.ogg",
-      "bytes": 26362,
-      "sha256": "2011b5a37a1e42d37ad9af313d6b8f82c8fd2cc5e88d1cfae84118c38b97465c"
-    },
-    {
       "file": "public/audio/voice/ankle.ogg",
       "bytes": 15972,
       "sha256": "3e87a1e4ff5a809ff565963e76f5b90c1da035b1cd100f3d5ffe8500bc268b02"
+    },
+    {
+      "file": "public/audio/voice/standing-prepare.ogg",
+      "bytes": 33982,
+      "sha256": "84edf3981e526c535847852f35ef1634b28708441f72335ab7ac56489fa2bf6a"
+    },
+    {
+      "file": "public/audio/voice/couple-prepare.ogg",
+      "bytes": 33593,
+      "sha256": "5984072d3ac75c04a8179b8d2a8c7810e89675d3d0c35a27eec7b713ce7b3b05"
+    },
+    {
+      "file": "public/audio/voice/floor-prepare.ogg",
+      "bytes": 33986,
+      "sha256": "9205e2ae4e258cf13dbaa46dbfabb0d1a87caefacc5bda9233d8ea508295324b"
+    },
+    {
+      "file": "public/audio/voice/standing-hamstring-left.ogg",
+      "bytes": 36028,
+      "sha256": "9bf30b85914dcba3145561263a05d58f9a4f770919a55db57a7bb737d7f43357"
+    },
+    {
+      "file": "public/audio/voice/standing-hamstring-right.ogg",
+      "bytes": 36724,
+      "sha256": "bfb3cf3bd9806a31a35c4a51984ce342d73d7ff68c69abb59b256ec2fdba707d"
+    },
+    {
+      "file": "public/audio/voice/standing-calf-left.ogg",
+      "bytes": 33007,
+      "sha256": "94c001f38c1293acf3b6d5acaadc8f4cc0d6e99be6d7c7f8eac2a81e8f181de2"
+    },
+    {
+      "file": "public/audio/voice/standing-calf-right.ogg",
+      "bytes": 33351,
+      "sha256": "f158810b3f6bc2612e86d6af4169629aeeefa1f4051e4eb1d39e1e5961da71f1"
+    },
+    {
+      "file": "public/audio/voice/standing-ankle.ogg",
+      "bytes": 33256,
+      "sha256": "95c9abb125bce53d45257e285dab970f368bc179e1c615d60cb421ab19df35c9"
+    },
+    {
+      "file": "public/audio/voice/floor-neck-left.ogg",
+      "bytes": 29055,
+      "sha256": "164999ffdf7f833cef974f9d94654fd9788c7f3d7b557278d9562b1b545137e1"
+    },
+    {
+      "file": "public/audio/voice/floor-neck-right.ogg",
+      "bytes": 29363,
+      "sha256": "350a40a365c6ee9677554db3dd34b3954bf761ca06378400f218882fdd5aa513"
+    },
+    {
+      "file": "public/audio/voice/floor-open.ogg",
+      "bytes": 23384,
+      "sha256": "e9c9a80e7c4f0797ec845ebe9f674fabee331c1aadf89f688c8f704a908847e7"
+    },
+    {
+      "file": "public/audio/voice/floor-reach.ogg",
+      "bytes": 29012,
+      "sha256": "7e75f80bd1d08ca3fbdf5c146ab9f3e726200c2486876928af7c6a0a0f40afe5"
+    },
+    {
+      "file": "public/audio/voice/floor-knee-left.ogg",
+      "bytes": 35655,
+      "sha256": "14bc287f621129a796df41a91b7ea0ee16323f778dda9100375077dfd10dca41"
+    },
+    {
+      "file": "public/audio/voice/floor-knee-right.ogg",
+      "bytes": 35852,
+      "sha256": "50e82683113575da96fa492f260ee695a957e26c771bb783821f49597bdab333"
+    },
+    {
+      "file": "public/audio/voice/floor-hamstring-left.ogg",
+      "bytes": 29717,
+      "sha256": "44c1266328faddbc1c183ce14caf41f9f80178d73d491e9f2b1c094472448e4a"
+    },
+    {
+      "file": "public/audio/voice/floor-hamstring-right.ogg",
+      "bytes": 29702,
+      "sha256": "565d033b1181e35b4829d0473f35486dfa17b98d7b01c44ace76048c69ea2547"
+    },
+    {
+      "file": "public/audio/voice/floor-twist-left.ogg",
+      "bytes": 26941,
+      "sha256": "9c4dc5fcfcebb2c00e0dddd7b2b9bfb96c0f7818a899017c15f2f4f553b05ed7"
+    },
+    {
+      "file": "public/audio/voice/floor-twist-right.ogg",
+      "bytes": 27215,
+      "sha256": "0348da44720a98ca946641822922c7d03984e415b3c8d087b53b51cb2f6ef67b"
+    },
+    {
+      "file": "public/audio/voice/floor-finish.ogg",
+      "bytes": 35404,
+      "sha256": "d35003cc3b2de848244c0f657c6c34be384a852d3867246f03689514f4a2d9fc"
     },
     {
       "file": "public/audio/maru-breeze.ogg",
@@ -184,13 +244,13 @@
     },
     {
       "file": "public/index.html",
-      "bytes": 10623,
-      "sha256": "ffd57fba88c17c72f07679eaea049d3d38eee202b427b7fba36ade024a5da7ab"
+      "bytes": 11102,
+      "sha256": "4cd38e5554613c4fe2c7a695e07fb8399e7117f093bcb8c465b1b11c91937f0f"
     },
     {
       "file": "public/style.css",
-      "bytes": 13178,
-      "sha256": "a22fc83ad068cc24f4449ff23b51a7ba9d609c220dd25d729f34c00d71da0093"
+      "bytes": 13515,
+      "sha256": "5272710735a3269f641c350bf85673346a30ccf88f7861fc0a8504a67f15b70c"
     },
     {
       "file": "src/core.mjs",
@@ -199,13 +259,23 @@
     },
     {
       "file": "src/app.mjs",
-      "bytes": 36671,
-      "sha256": "5fe3f2d9f65757f7cd1d8445b55c7305fa6e602b4c3b05374028d55f1cd93300"
+      "bytes": 39223,
+      "sha256": "6f203d2b132e41483512d19cee07687e9ad0b25dd7c7b07efbfdf6379e284430"
     },
     {
       "file": "src/routine.mjs",
-      "bytes": 4729,
-      "sha256": "5d8ee61478699eea18de30fe37c5c3f8c83e409b1766b98fa92e2454ff54b13e"
+      "bytes": 1362,
+      "sha256": "55a0bd682566c85713a6ce65b6b3c62b3ec888e0bd07b0ea15ee9cb730dce471"
+    },
+    {
+      "file": "src/routine-profiles.mjs",
+      "bytes": 7764,
+      "sha256": "be8821d4a7db188cee321fd1c1e9fcd01a68ca497e6b0e501dc615e40a8b90e2"
+    },
+    {
+      "file": "src/figures.mjs",
+      "bytes": 2887,
+      "sha256": "888d096f4bcbe64fb7e4ee819450fc1a3fbbdad5d2dfd0f6c7c22f5b4f2f19ec"
     }
   ]
 }
