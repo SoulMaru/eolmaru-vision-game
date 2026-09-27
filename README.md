@@ -61,6 +61,7 @@ npm start
 ## 다음 AI를 위한 자료
 
 - [단계별 TODO](docs/PLAN.md)
+- [세이버 방식 손 리듬: AI 개발 프롬프트와 TODO](docs/SABER_PROMPTS.md) — 다음 개발용 문서, 아직 구현 전
 - [요구 변경과 결정](docs/DECISIONS.md)
 - [GitHub·Reddit·운동 자료 조사](docs/RESEARCH.md)
 - [인수인계 및 알려진 제한](docs/HANDOFF.md)
