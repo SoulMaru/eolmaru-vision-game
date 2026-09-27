@@ -1,10 +1,11 @@
 {
-  "checkedAt": "2026-09-27T07:48:24.444Z",
-  "runtimeFiles": 64,
-  "runtimeBytes": 33659883,
+  "checkedAt": "2026-09-27T08:01:55.687Z",
+  "runtimeFiles": 71,
+  "runtimeBytes": 38202621,
   "missing": [],
   "duplicates": [],
   "voiceErrors": [],
+  "musicErrors": [],
   "externalRuntimeReferences": [],
   "files": [
     {
@@ -228,6 +229,26 @@
       "sha256": "963830465320d2279fa6d10e3e0eeab841014b5b14d1706b5dc4dad6c95df62b"
     },
     {
+      "file": "public/audio/maru-neon-drive.ogg",
+      "bytes": 2219066,
+      "sha256": "e0cdf1808a0fe94744d5e7c3e9664c985e24802b46cebb4e969d9956a4fd7aca"
+    },
+    {
+      "file": "public/audio/maru-neon-drive.json",
+      "bytes": 4114,
+      "sha256": "6ab4ca830d3225d5135f1cb4137ee97498b3bfe597ba0ca8cd9879c5ac7b6080"
+    },
+    {
+      "file": "public/audio/maru-pulse-rush.ogg",
+      "bytes": 2253505,
+      "sha256": "3ac7824c0b9a8261287b4b61f0a1ad3aab0c63d226170f78db15f93f1922eb41"
+    },
+    {
+      "file": "public/audio/maru-pulse-rush.json",
+      "bytes": 4212,
+      "sha256": "b2380a8964e4ff0dd0e727670ea4a4dd0a9f227fabb6be89bda623f8c307b016"
+    },
+    {
       "file": "public/models/pose_landmarker_lite.task",
       "bytes": 5777746,
       "sha256": "59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a"
@@ -239,8 +260,8 @@
     },
     {
       "file": "public/index.html",
-      "bytes": 11474,
-      "sha256": "03017b5a87ebd30a2896dee10aef15b87a2c171be6f90defc6af728a92d2ee7a"
+      "bytes": 11476,
+      "sha256": "4e2e0cb9651f3e7a36c8fe299a8ddff920d619b9cf56e8b11516ab0a7cfd9c31"
     },
     {
       "file": "public/style.css",
@@ -258,14 +279,24 @@
       "sha256": "839f155da56f525c853d1a9d2c963c64f86afd948093fce7c14aefb443f78fb9"
     },
     {
+      "file": "public/charts/maru-neon-drive.saber.json",
+      "bytes": 29856,
+      "sha256": "46efc5c4d97abcc357adba50a985d00fdd4addd2a70197afff54bc67b28d6ce2"
+    },
+    {
+      "file": "public/charts/maru-pulse-rush.saber.json",
+      "bytes": 30838,
+      "sha256": "2f92bcdf7e40ffb9d81b2e414a28370d95619a210079c1bc937dcd4c797ed5f1"
+    },
+    {
       "file": "src/core.mjs",
       "bytes": 6818,
       "sha256": "1fd29ee1f8367f53b5499b5d06a5f1d83d30140fa4861f59c3032cb0f99b1d6c"
     },
     {
       "file": "src/app.mjs",
-      "bytes": 40471,
-      "sha256": "936d7f80489e568f8b2db2c99a92eddfbeb67008f9f4f03347e41b8254721632"
+      "bytes": 40949,
+      "sha256": "83fe575235fc03944e0056dc006de30811494d15edf2b6507acdce3ae18d58c7"
     },
     {
       "file": "src/routine.mjs",
@@ -326,6 +357,11 @@
       "file": "src/saber-editor.mjs",
       "bytes": 16645,
       "sha256": "7ad9ae07df27cd0aca47a98bb7320eaec142b0c9adb89c2df4ef82ae1c4a90bc"
+    },
+    {
+      "file": "src/songs.mjs",
+      "bytes": 667,
+      "sha256": "630c71032528f928181912e9f387276e5103878396f416b72cdd67576d4aa107"
     }
   ]
 }

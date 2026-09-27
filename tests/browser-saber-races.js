@@ -1,5 +1,6 @@
 // Load with browser-saber-races-init.js BEFORE navigation.
-// Run fresh pages ?race=import, ?race=editor, ?race=file, ?race=stale-editor.
+// Run fresh pages ?race=import, ?race=editor, ?race=file, ?race=stale-editor,
+// and ?race=fast-song after the dance catalog is installed.
 // This uses only DOM events/UI and synthetic File objects; it never accesses app-private state.
 (async()=>{
   const $=id=>document.getElementById(id),probe=window.__saberRace,checks=[],scenario=new URL(location.href).searchParams.get('race');
@@ -40,6 +41,13 @@
     probe.releaseFile();await until(()=>!$('chart-import').disabled);await delay(80);
     check('controls unlock after the read',!$('play').disabled&&!$('song-select').disabled);
     openEditor();check('delayed file applies once to the unchanged song',readDraft().notes[0].id==='delayed-file'&&readDraft().bpm===120);closeEditor();
+  }else if(scenario==='fast-song'){
+    $('song-select').value='maru-neon-drive';$('song-select').dispatchEvent(new Event('change'));
+    check('fast song source and timing apply while original chart is delayed',$('song-select').value==='maru-neon-drive'&&$('music').getAttribute('src')==='/audio/maru-neon-drive.ogg'&&Number($('progress').max)===153.6);
+    openEditor();const selected=readDraft();check('fast song owns its own chart',selected.songId==='maru-neon-drive'&&selected.bpm===150);closeEditor();
+    probe.releaseFetch();await until(()=>probe.fetchDelivered);await delay(80);
+    check('late original-song response preserves fast song selection',$('song-select').value==='maru-neon-drive'&&$('music').getAttribute('src')==='/audio/maru-neon-drive.ogg'&&$('song-description').textContent.includes('150 BPM'));
+    openEditor();check('late original-song response cannot replace fast song chart',JSON.stringify(readDraft())===JSON.stringify(selected));closeEditor();
   }else if(scenario==='stale-editor'){
     probe.releaseFetch();await until(()=>probe.fetchDelivered);await delay(80);openEditor();importDraft('newer-editor-chart');
     // An adversarial delayed file event while the modal is already open tests the

@@ -1,0 +1,158 @@
+{
+  "id": "maru-pulse-rush",
+  "title": "Maru Pulse Rush · 빛의 댄스",
+  "file": "maru-pulse-rush.ogg",
+  "artist": "얼마루 비전게임",
+  "bpm": 156,
+  "duration": 147.69229,
+  "durationSeconds": 147.6923076923077,
+  "beatOffsetSeconds": 0,
+  "beats": 384,
+  "bars": 96,
+  "timeSignature": "4/4",
+  "sampleRate": 44100,
+  "channels": 2,
+  "seed": 20261012,
+  "genre": "original uplifting dance",
+  "key": "C major / A minor",
+  "license": "CC0-1.0",
+  "vocals": false,
+  "externalSamples": false,
+  "engine": {
+    "mode": "F-drive-signature-soundtrack-plus-original-dance-arrangement",
+    "source": "F:\\0.SoulmaruAI\\1.aiimage\\webtoon-translator\\local-api\\backend\\python\\video\\webtoon.py",
+    "function": "signature_soundtrack",
+    "sha256": "de182299dbf5216aaeaaa08303ae19c8785a537518b9ba1d3e44f6164edf3df3",
+    "functionSha256": "af31ddaee30f774d39ee6b6cf27a93b60aaa2ce8d7638aeddbaadc841db6b51c",
+    "use": "Actually rendered with music=True, bell=False. Quiet five-second intro and ending only.",
+    "neuralModelUsed": false,
+    "sourceModified": false
+  },
+  "generator": "tools/music-dance-compose.py",
+  "generatorSha256": "8f6f7505f1aaaf6d4bd67e989c3abc03608cd16d6a65dbe8beb8fc859355c757",
+  "arrangement": {
+    "chordsMidi": [
+      [
+        48,
+        52,
+        55
+      ],
+      [
+        43,
+        47,
+        50
+      ],
+      [
+        45,
+        48,
+        52
+      ],
+      [
+        41,
+        45,
+        48
+      ]
+    ],
+    "hook": [
+      72,
+      76,
+      79,
+      76,
+      81,
+      79,
+      76,
+      74,
+      72,
+      76,
+      79,
+      84,
+      81,
+      79,
+      76,
+      72
+    ],
+    "drums": "Quarter-note synthesized kick, beat-2/4 clap, alternating sixteenth hats, builds and short fills.",
+    "bass": "New offbeat synthesized bass notes; no stretching or recycling of older Maru tracks.",
+    "synthesis": "Bounded additive oscillators, seeded band-limited noise, saturation, beat-ducked pads.",
+    "mastering": "Two-pass FFmpeg loudnorm, target -14 LUFS / -2 dBTP / LRA 9, Vorbis quality 5."
+  },
+  "sections": [
+    {
+      "name": "intro",
+      "startBar": 0,
+      "endBar": 8,
+      "startSeconds": 0.0,
+      "endSeconds": 12.307692
+    },
+    {
+      "name": "groove",
+      "startBar": 8,
+      "endBar": 24,
+      "startSeconds": 12.307692,
+      "endSeconds": 36.923077
+    },
+    {
+      "name": "build-one",
+      "startBar": 24,
+      "endBar": 32,
+      "startSeconds": 36.923077,
+      "endSeconds": 49.230769
+    },
+    {
+      "name": "drop-one",
+      "startBar": 32,
+      "endBar": 48,
+      "startSeconds": 49.230769,
+      "endSeconds": 73.846154
+    },
+    {
+      "name": "short-break",
+      "startBar": 48,
+      "endBar": 56,
+      "startSeconds": 73.846154,
+      "endSeconds": 86.153846
+    },
+    {
+      "name": "build-two",
+      "startBar": 56,
+      "endBar": 64,
+      "startSeconds": 86.153846,
+      "endSeconds": 98.461538
+    },
+    {
+      "name": "drop-two",
+      "startBar": 64,
+      "endBar": 88,
+      "startSeconds": 98.461538,
+      "endSeconds": 135.384615
+    },
+    {
+      "name": "outro",
+      "startBar": 88,
+      "endBar": 96,
+      "startSeconds": 135.384615,
+      "endSeconds": 147.692308
+    }
+  ],
+  "measurements": {
+    "masterPeak": 0.78,
+    "masterRms": 0.159625,
+    "decodedPeak": 0.851309,
+    "decodedPeakDbFS": -1.398,
+    "decodedRms": 0.194505,
+    "decodedRmsDbFS": -14.221,
+    "integratedLufs": -13.89,
+    "truePeakDbTP": -1.38,
+    "loudnessRangeLU": 3.3,
+    "decodedFrames": 6513231,
+    "fullDecodePassed": true,
+    "fileBytes": 2253505,
+    "sha256": "3ac7824c0b9a8261287b4b61f0a1ad3aab0c63d226170f78db15f93f1922eb41"
+  },
+  "toolVersions": {
+    "python": "3.12.10",
+    "numpy": "2.5.2",
+    "ffmpeg": "ffmpeg version 8.1.2-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers"
+  },
+  "review": "Full distributed-file decode, duration, stereo, peak/RMS/LUFS and hashes measured automatically. Human listening, taste and physical speaker playback remain unverified."
+}

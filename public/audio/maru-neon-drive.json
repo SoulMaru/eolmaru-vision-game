@@ -1,0 +1,158 @@
+{
+  "id": "maru-neon-drive",
+  "title": "Maru Neon Drive · 네온 질주",
+  "file": "maru-neon-drive.ogg",
+  "artist": "얼마루 비전게임",
+  "bpm": 150,
+  "duration": 153.6,
+  "durationSeconds": 153.60000000000002,
+  "beatOffsetSeconds": 0,
+  "beats": 384,
+  "bars": 96,
+  "timeSignature": "4/4",
+  "sampleRate": 44100,
+  "channels": 2,
+  "seed": 20261011,
+  "genre": "original melodic techno",
+  "key": "A minor",
+  "license": "CC0-1.0",
+  "vocals": false,
+  "externalSamples": false,
+  "engine": {
+    "mode": "F-drive-signature-soundtrack-plus-original-dance-arrangement",
+    "source": "F:\\0.SoulmaruAI\\1.aiimage\\webtoon-translator\\local-api\\backend\\python\\video\\webtoon.py",
+    "function": "signature_soundtrack",
+    "sha256": "de182299dbf5216aaeaaa08303ae19c8785a537518b9ba1d3e44f6164edf3df3",
+    "functionSha256": "af31ddaee30f774d39ee6b6cf27a93b60aaa2ce8d7638aeddbaadc841db6b51c",
+    "use": "Actually rendered with music=True, bell=False. Quiet five-second intro and ending only.",
+    "neuralModelUsed": false,
+    "sourceModified": false
+  },
+  "generator": "tools/music-dance-compose.py",
+  "generatorSha256": "8f6f7505f1aaaf6d4bd67e989c3abc03608cd16d6a65dbe8beb8fc859355c757",
+  "arrangement": {
+    "chordsMidi": [
+      [
+        45,
+        48,
+        52
+      ],
+      [
+        41,
+        45,
+        48
+      ],
+      [
+        38,
+        41,
+        45
+      ],
+      [
+        40,
+        44,
+        47
+      ]
+    ],
+    "hook": [
+      0,
+      0,
+      7,
+      12,
+      10,
+      7,
+      3,
+      7,
+      0,
+      12,
+      7,
+      15,
+      12,
+      10,
+      7,
+      3
+    ],
+    "drums": "Quarter-note synthesized kick, beat-2/4 clap, alternating sixteenth hats, builds and short fills.",
+    "bass": "New offbeat synthesized bass notes; no stretching or recycling of older Maru tracks.",
+    "synthesis": "Bounded additive oscillators, seeded band-limited noise, saturation, beat-ducked pads.",
+    "mastering": "Two-pass FFmpeg loudnorm, target -14 LUFS / -2 dBTP / LRA 9, Vorbis quality 5."
+  },
+  "sections": [
+    {
+      "name": "intro",
+      "startBar": 0,
+      "endBar": 8,
+      "startSeconds": 0.0,
+      "endSeconds": 12.8
+    },
+    {
+      "name": "groove",
+      "startBar": 8,
+      "endBar": 24,
+      "startSeconds": 12.8,
+      "endSeconds": 38.4
+    },
+    {
+      "name": "build-one",
+      "startBar": 24,
+      "endBar": 32,
+      "startSeconds": 38.4,
+      "endSeconds": 51.2
+    },
+    {
+      "name": "drop-one",
+      "startBar": 32,
+      "endBar": 48,
+      "startSeconds": 51.2,
+      "endSeconds": 76.8
+    },
+    {
+      "name": "short-break",
+      "startBar": 48,
+      "endBar": 56,
+      "startSeconds": 76.8,
+      "endSeconds": 89.6
+    },
+    {
+      "name": "build-two",
+      "startBar": 56,
+      "endBar": 64,
+      "startSeconds": 89.6,
+      "endSeconds": 102.4
+    },
+    {
+      "name": "drop-two",
+      "startBar": 64,
+      "endBar": 88,
+      "startSeconds": 102.4,
+      "endSeconds": 140.8
+    },
+    {
+      "name": "outro",
+      "startBar": 88,
+      "endBar": 96,
+      "startSeconds": 140.8,
+      "endSeconds": 153.6
+    }
+  ],
+  "measurements": {
+    "masterPeak": 0.78,
+    "masterRms": 0.155827,
+    "decodedPeak": 0.837247,
+    "decodedPeakDbFS": -1.543,
+    "decodedRms": 0.199955,
+    "decodedRmsDbFS": -13.981,
+    "integratedLufs": -14.01,
+    "truePeakDbTP": -1.5,
+    "loudnessRangeLU": 3.1,
+    "decodedFrames": 6773760,
+    "fullDecodePassed": true,
+    "fileBytes": 2219066,
+    "sha256": "e0cdf1808a0fe94744d5e7c3e9664c985e24802b46cebb4e969d9956a4fd7aca"
+  },
+  "toolVersions": {
+    "python": "3.12.10",
+    "numpy": "2.5.2",
+    "ffmpeg": "ffmpeg version 8.1.2-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers"
+  },
+  "review": "Full distributed-file decode, duration, stereo, peak/RMS/LUFS and hashes measured automatically. Human listening, taste and physical speaker playback remain unverified."
+}
