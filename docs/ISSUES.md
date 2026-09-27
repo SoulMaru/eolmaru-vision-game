@@ -1,0 +1,27 @@
+# 오류 및 후속 검증 검색 메모
+
+## 실제 사용 확인 대기
+
+| ID | 상황/재현 | 현재 동작 | 다음 검증 / 검색어 |
+|---|---|---|---|
+| H01 | 두 사람이 실제 카메라 양쪽에서 손을 뻗기 | 좌우 고정 슬롯·가운데6% 완충구역 | 1인/2인 완주, 한명퇴장, 교차/가림. `MediaPipe PoseLandmarker numPoses occlusion identity` |
+| H02 | 카메라 가까이 앉거나 발/손이 프레임 밖 | 보이는 신뢰도 있는 상체만 비교; 목/하체 안내 유지 | 의자/카메라 높이/전신 프레이밍. `MediaPipe pose wrist visibility seated partial body` |
+| H03 | 박자에 맞췄는데 체감상 늦음 | 오디오 시계 기준 ±300ms 보정 제공 | 실제 카메라 지연을 관측한 뒤 기본값 조정. `rhythm game audio input latency calibration` |
+| H04 | 인식마다 화면이 잠깐 끊김 | 기본12Hz, 추론85ms 초과시 최대8Hz, 640px, GPU→CPU fallback | 사람2명 실측 후 필요시 Worker 전환. `MediaPipe Tasks Vision OffscreenCanvas worker wasm module` |
+| H05 | 한국어 안내/음악의 발음·음량 | F 해미 음성·별도 볼륨·음악 ducking | 사람 청취. `Windows SAPI Korean Heami pronunciation` |
+| H06 | 사용자 곡의 비트가 채보와 안 맞음 | 사용자 BPM 입력, 파일 시작0초 기준 규칙적 채보 | 인트로 오프셋·변박 자동분석은 미구현. 우선 기본곡 사용. `audio beat detection onset tempo offset local` |
+| H07 | 발끝/목의 움직임을 정확하게 평가하고 싶음 | 해당 동작 시간 안내, 수행/효과 점수 없음 | 다중시점·개인 보정·실제 영상 검증 없이는 정밀 기능이라고 주장하지 않음 |
+
+## 수정 확인된 문제
+
+- R01: 상체가 수직인데 옆구리 동작99점 → 몸통 기울기 오차를 별도 반영, 회귀검사.
+- R02: 시작·재개 중 탭숨김/카메라종료 경합 → 단계 잠금과 세션토큰.
+- R03: video.readyState<2에서 오래된 포즈 유지 → readyState 검사 전에400ms 신선도 검사.
+- R04: 작은 화면에서 캐릭터가 목표와 다른 비율 → 같은 폭/높이 좌표계.
+- R05: 계속하기 버튼 초점에서 방향키 무시 → 버튼에서도 방향 입력 전달, 브라우저 회귀.
+- R06: 완주 후 시간/점수 잔여 → 세션 초기화 통합.
+- R07: 사용자곡 로딩 중 전신모드 전환 → 로딩 중 모드잠금, 완료 후 모드 재확인.
+- 코치 반복 재생 → 동작 구간 index 변경시에만 한 번 안내.
+- 곡 전환 중복 → 즉시 transition 단계잠금 및 현재 audio.ended 확인.
+
+고장 난 메뉴를 완료 기능으로 남기지 않는다. 미구현 자동BPM, 온라인순위, 신원고정, 의료적 전신판정, 게임중 작곡은 메뉴에서 제외했다.
