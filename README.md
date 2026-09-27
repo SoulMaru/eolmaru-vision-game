@@ -62,6 +62,7 @@ npm start
 
 - [단계별 TODO](docs/PLAN.md)
 - [세이버 방식 손 리듬: AI 개발 프롬프트와 TODO](docs/SABER_PROMPTS.md) — 다음 개발용 문서, 아직 구현 전
+- [세이버 전환 진행표·설계](docs/SABER_PROGRESS.md) · [단계별 독립 검토](docs/SABER_REVIEW.md) — 0단계 기준 검사와 설계, 게임은 0.3 유지
 - [요구 변경과 결정](docs/DECISIONS.md)
 - [GitHub·Reddit·운동 자료 조사](docs/RESEARCH.md)
 - [인수인계 및 알려진 제한](docs/HANDOFF.md)

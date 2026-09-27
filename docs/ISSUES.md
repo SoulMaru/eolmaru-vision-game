@@ -38,3 +38,17 @@
 - V01: 동작위치 안내문구와캐릭터다리겹침/작은창예시과소 → 안내문구위로캐릭터범위를제한,좁은세로창전신예시/설명카드상하배치.
 - F01: 내장브라우저/iframe에서Fullscreen권한거절가능 → 실패상태를표시하고창에서도진행;Start-Eolmaru.cmd로Chrome/Edge에서다시열기. `Fullscreen API transient activation permissions policy iframe allowfullscreen`.
 - A01: 시범소리음높이·음악밸런스의사람청취미검증. `Web Audio oscillator cue timing perceived latency`.
+
+## 세이버 전환 — 단계 0에서 확인한 후속 구현 항목
+
+2026-09-27 KST, 기준 fdbd8b4. 아래는 현행 0.3의 새 장애를 재현했다는 뜻이 아니라, 새 세이버 요구와 현행 구조의 차이다. 이번에는 코드 수정 없이 설계/검토했으며 구현은 미완료다. 진행표: [SABER_PROGRESS](SABER_PROGRESS.md), 독립 근거: [SABER_REVIEW](SABER_REVIEW.md).
+
+| ID | 확인 근거 / 향후 재현 조건 | 필요한 처리와 검사 | 상태 / 검색어 |
+|---|---|---|---|
+| SB01 | GestureTracker는 양손 방향을 Set으로 합치고 hit에는 lane만 전달. 양손이 같은 방향이면 손 소유 정보가 없음 | 새 손목 표본과 hand/player/stroke/epoch. 정지·관통·틀린 손·중복 베기 검사 | 단계 1/3/4 대기. `webcam wrist swept segment hand identity` |
+| SB02 | assignPlayers는 같은 구역 둘 중 한 명 선택, 이전 사람 연속성을 저장하지 않음 | 세이버 구역 충돌은 비움, 소실/재배정 시 epoch 변경. 현행 전신 정책에 섞지 않음 | 단계 6 대기. `pose slot ambiguity tracking discontinuity` |
+| SB03 | 공용 offset이 판정·렌더·시범음에 함께 적용, 기존 범위 ±300ms | 채보 offset과 입력 지연 ±250ms를 별도 설정으로 분리. 새 설정 첫 기본값 0을 표시하고 기존값을 조용히 이식하지 않음. 부호/왕복 검사 | 단계 2/4/5 대기. `rhythm chart offset input latency separate clocks` |
+| SB04 | RhythmAudio.setChart는 demoTime/lane을 요구함 | 새 hand/4×3 채보는 별도 어댑터. 타격음은 판정 이벤트, 정지/탐색 때 예약음 취소 | 단계 2/5/7 대기. `Web Audio chart event adapter cancel seek` |
+| SB05 | expireNotes는 현재 시각으로 즉시 만료함 | 교차 시각 판정과 유한 유예 뒤 miss/untracked 구분. 창 끝 뒤 도착한 유효 표본 검사 | 단계 3 대기. `rhythm delayed sample watermark grace period` |
+| SB06 | show-render의 전신 그림도 show의 ACTS/drawWorld에 의존 | 리듬만 교체, 공유 렌더 보존. 전신 225초/누운 무채점/커플 회귀 | 단계 1~9 공통. `shared renderer dependency regression` |
+| SB07 | 아직 실제 웹캠의 세이버 궤적/도달 범위/2인 체감 지연을 측정한 결과 없음 | 8/12/20Hz 합성과 실제 1인/2인·가림·손 교차를 분리 기록 | 단계 4/6/9 대기. `low fps wrist interpolation false positive calibration` |
