@@ -1,6 +1,6 @@
 # 검토엔진 검수 기록
 
-최신 **0.7**의 독립 검토는 [ARCADE_REVIEW](ARCADE_REVIEW.md), 실제 통합 증거는 [TEST_RESULTS](TEST_RESULTS.md)에 있다. 아래0.6 이하의 검사 수와120~180초 파일 제한은 해당 과거 버전의 기록이다. 현재 긴 파일 정책은 원본 보존·앞150초다.
+최신 **0.8**의 독립 검토는 [TUTORIAL_REVIEW](TUTORIAL_REVIEW.md), 실제 통합 증거는 [TEST_RESULTS](TEST_RESULTS.md)에 있다. 자리 연속시간·정지 손 보정·인원 전환·준비 중 음악 경계 TR01~04를 재현하고 수정 확인했다. 아래의 검사 수는 해당 과거 버전의 기록이다. 현재 긴 파일 정책은 원본 보존·앞150초이며 전신225초와 구별한다.
 
 최신0.6의 독립 검토와 재현 결과는 [TRAINING_REVIEW](TRAINING_REVIEW.md), 통합 브라우저 증거는 [TEST_RESULTS](TEST_RESULTS.md)를 읽는다. 아래 검사 수는 각 과거 시점의 이력이며 현재 전체 수가 아니다.
 

@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-09-27T09:40:55.052Z",
-  "runtimeFiles": 104,
-  "runtimeBytes": 56768283,
+  "checkedAt": "2026-09-27T10:54:08.574Z",
+  "runtimeFiles": 108,
+  "runtimeBytes": 56799216,
   "missing": [],
   "duplicates": [],
   "voiceErrors": [],
@@ -375,13 +375,13 @@
     },
     {
       "file": "public/index.html",
-      "bytes": 14329,
-      "sha256": "530a109b9407b2486b642064a92b0f0fe7b03a317539994e26b861e11fa74f23"
+      "bytes": 16105,
+      "sha256": "f46e85b316837294401195e6d1ac47959fb7b447694344c11b567261c838bf5d"
     },
     {
       "file": "public/style.css",
-      "bytes": 13322,
-      "sha256": "2d7a6a2f44c5c33bdbdfb60bbb082ec5fccc9b7ded82bc340a8cc8e4df6c8166"
+      "bytes": 14076,
+      "sha256": "8e25d9f020b4fbe9e0305d63ac7876d08f2590270aa5e0f1417a7c56005d3e3b"
     },
     {
       "file": "public/saber-editor.css",
@@ -445,8 +445,8 @@
     },
     {
       "file": "src/app.mjs",
-      "bytes": 43525,
-      "sha256": "b616c9f6343a033402f7061a3f24324ca450e1ea9330875e99adf45f3b52c2c6"
+      "bytes": 46340,
+      "sha256": "63d8a1e43688d860739a6658d231c72090e98c00be08d0ab99c4100c819e4fb4"
     },
     {
       "file": "src/routine.mjs",
@@ -485,8 +485,8 @@
     },
     {
       "file": "src/saber-input.mjs",
-      "bytes": 4444,
-      "sha256": "3f3e2604420e744746cd559ec276e0e9d8e207dfc5982c25afbf7001e68dc9dc"
+      "bytes": 5640,
+      "sha256": "b40ac7169690f43eb1ece69eb7d01576b1be3f06901ba1c57a9f1bd9c9cff1c6"
     },
     {
       "file": "src/saber-core.mjs",
@@ -495,13 +495,13 @@
     },
     {
       "file": "src/saber-render.mjs",
-      "bytes": 23859,
-      "sha256": "1d4321ddd342bbc6979e4230bd2ad669ea77d98604ce74030e52e8e50418569f"
+      "bytes": 23916,
+      "sha256": "a2256df7c2ee83140c0d77b64419ae1f130d7161789028832380b92c596234f0"
     },
     {
       "file": "src/saber-game.mjs",
-      "bytes": 9625,
-      "sha256": "b9a3836cae6189f02390fb186a7c751c34c885529383f126d81ea654c04bbbcc"
+      "bytes": 10429,
+      "sha256": "690e6190120fa89efe0c64fe520903a4ffd1f3bc8a119ec4cd9d7e03e7e68345"
     },
     {
       "file": "src/saber-editor.mjs",
@@ -515,8 +515,8 @@
     },
     {
       "file": "src/saber-feedback.mjs",
-      "bytes": 7104,
-      "sha256": "6277a5ca772d245d5d471f1ffa816fa9514988651d99faddedc8c64a51023cad"
+      "bytes": 7172,
+      "sha256": "8750ecde3a47b005db122fc517fa63b3f186cce25618719985eb6829c840d9ac"
     },
     {
       "file": "src/local-music.mjs",
@@ -527,6 +527,26 @@
       "file": "src/saber-dance.mjs",
       "bytes": 4656,
       "sha256": "da42d3eac6665541e7ea1764a114d592bf961645eb10bab0f85a8ccc7a8ea92e"
+    },
+    {
+      "file": "src/saber-swing.mjs",
+      "bytes": 2406,
+      "sha256": "b65eca4695d1c613a4a0ba7a10a4fda209f42ba22b615255c372ca4129401f45"
+    },
+    {
+      "file": "src/saber-bass.mjs",
+      "bytes": 816,
+      "sha256": "2a2f81f9c00e314b8c39abfacd9705ab4461e7ddac7bf303aa9c021f83cd9961"
+    },
+    {
+      "file": "src/tutorial-core.mjs",
+      "bytes": 7975,
+      "sha256": "772a08c5586917155e583cb8ff407c291eb1a01c18498089cc03b3ec69583409"
+    },
+    {
+      "file": "src/tutorial.mjs",
+      "bytes": 12266,
+      "sha256": "a853b6a2e02b98127273fcdbaeabc025927f92db70c59d4b881f843896cddfde"
     }
   ]
 }

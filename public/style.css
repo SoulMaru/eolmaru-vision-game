@@ -13,3 +13,5 @@ dialog{border:1px solid #537074;border-radius:20px;background:#203345;color:#eff
 .saber-tools input[type=range]{width:100%;margin:0;accent-color:#a7efd6}.saber-tools output{float:right;color:#a7efd6}.sidebar .saber-tools>label{margin:0}.sidebar #target-spacing{margin:0;font-size:10px;padding:7px}
 
 .local-song-help{font-size:8px;color:#9eb8c7;margin-top:-9px}.in-session .local-song-help{display:none}
+
+.tutorial-panel{border:1px solid #647bab;border-radius:14px;padding:12px;background:#182b45;margin:10px 0}.tutorial-panel h2{font-size:16px;color:#b9f0df;margin:10px 0}.tutorial-panel p{font-size:11px;line-height:1.7;color:#d0deef}.tutorial-panel .tutorial-hint{padding:8px;border-radius:8px;background:#263650;color:#ffe6ad}.tutorial-panel button{width:100%;margin-top:6px}.tutorial-panel .button-pair button{font-size:9px}.tutorial-panel #tutorial-progress p{padding:5px;background:#0e1e32;border-radius:6px}.tutorial-panel #tutorial-progress .ready{color:#9df3cd}.tutorial-panel label{font-size:10px}.tutorial-panel select{margin:5px 0}body[data-mode="tutorial"] .camera-guide{display:none}body[data-mode="tutorial"] .local-song-help{display:none}

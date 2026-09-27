@@ -1,6 +1,6 @@
 # 얼마루비전게임 단계별 계획
 
-최신 **0.7**은 블래스터 타격음, 바탕화면 바로가기, 긴 로컬 음악의 앞150초 재생, 무지개·두 포즈 춤이다. [ARCADE_PLAN](ARCADE_PLAN.md) → [ARCADE_REVIEW](ARCADE_REVIEW.md) → [TEST_RESULTS](TEST_RESULTS.md)를 먼저 읽는다. 아래0.6 이하는 과거 개발 이력이다.
+최신 **0.8**은 별도 7단계 튜토리얼, 팔 방향에 맞춰 회전하는 검, 정확도에 따라 커지는 3종 베이스다. [TUTORIAL_PLAN](TUTORIAL_PLAN.md) → [TUTORIAL_REVIEW](TUTORIAL_REVIEW.md) → [TEST_RESULTS](TEST_RESULTS.md)를 먼저 읽는다. 기존 바탕화면·내 음악·춤·전신 세트를 보존한다. 아래는 과거 개발 이력이다.
 
 최신0.6 요구는 **80/90/100/110/120/130/140 BPM7곡, 접근 속도·등장 간격, 한 번/계속 베기**다. 단계·정책·수락표는 [TRAINING_PLAN](TRAINING_PLAN.md), 독립 검토는 [TRAINING_REVIEW](TRAINING_REVIEW.md), 제작 이력은 [TEMPO_MUSIC](TEMPO_MUSIC.md)에서 이어간다. 아래0.5이하 문서는 이전 개발 이력이다.
 

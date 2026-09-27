@@ -4,8 +4,8 @@ import {createHands,assignSaberPlayers,calibrationFromPose,poseHand,calibrationM
 import {drawSaber,stageToGrid} from './saber-render.mjs';
 
 export class SaberGame {
-  constructor({stage,audio,phase,players,input,notice,onHit,onReset,latency,range,quality,trainingSettings=()=>({}),dance=()=>null}){
-    Object.assign(this,{stage,audio,phase,players,input,notice,onHit,onReset,latency,range,quality,trainingSettings,dance});
+  constructor({stage,audio,phase,players,input,notice,onHit,onReset,onCalibration,latency,range,quality,trainingSettings=()=>({}),dance=()=>null}){
+    Object.assign(this,{stage,audio,phase,players,input,notice,onHit,onReset,onCalibration,latency,range,quality,trainingSettings,dance});
     this.chart=generateEasyChart();this.selected={player:0,hand:'left'};this.keys=new Set();this.sessionId=0;this.epoch=0;
     this.calibrations=[null,null];this.cameraPoses=[null,null];this.status=['손을 편안하게 준비해요','손을 편안하게 준비해요'];
     this.points=[{left:{x:1.5,y:2.7},right:{x:2.5,y:2.7}},{left:{x:1.5,y:2.7},right:{x:2.5,y:2.7}}];
@@ -52,15 +52,17 @@ export class SaberGame {
     const fid=++this.frameId;
     slots.forEach((pose,player)=>{
       if(!pose){
+        if(this.calibrationTask)this.calibrationTask.points[player]=[];
         this.calibrations[player]=null;HANDS.forEach(h=>this.hands[player][h].missing());this.status[player]='인식 대기 · 내 구역에 앉아 주세요';return;
       }
       if(calibrationMoved(pose,this.calibrations[player])){
+        if(this.calibrationTask)this.calibrationTask.points[player]=[];
         this.calibrations[player]=calibrationFromPose(pose,aspect,this.range());HANDS.forEach(h=>this.hands[player][h].reset());
       }
       const c=this.calibrations[player];
       if(!c){this.status[player]='어깨·몸통·두 손을 보여 주세요';return;}
       if(this.calibrationTask){
-        for(const id of [15,16]){const point=pose[id],confidence=point?.visibility??1;if(point&&[point.x,point.y,confidence].every(Number.isFinite)&&confidence>=.55&&confidence<=1)this.calibrationTask.points[player].push({x:point.x*aspect,y:point.y});}
+        for(const [hand,id] of [['left',15],['right',16]]){const point=pose[id],confidence=point?.visibility??1;if(point&&[point.x,point.y,confidence].every(Number.isFinite)&&confidence>=.55&&confidence<=1&&point.x>=0&&point.x<=1&&point.y>=0&&point.y<=1)this.calibrationTask.points[player].push({x:point.x*aspect,y:point.y,hand});}
       }
       let valid=0;
       for(const hand of HANDS){const p=poseHand(pose,hand,c);if(p)valid++;this.sample(player,hand,p,now,capturedAudioTime,'camera',fid);}
@@ -75,15 +77,18 @@ export class SaberGame {
     this.notice('5초 동안 양손을 편하게 닿는 위·아래·좌·우로 움직여 주세요.');
   }
   finishCalibration(){
-    const task=this.calibrationTask;if(!task)return;this.calibrationTask=null;let success=0;
+    const task=this.calibrationTask;if(!task)return;this.calibrationTask=null;let success=0;const succeeded=Array(this.players()).fill(false);
     for(let player=0;player<this.players();player++){
       const points=task.points[player],c=this.calibrations[player];if(!c||points.length<20)continue;
+      // Separation between two stationary hands is not evidence of either hand moving.
+      if(!HANDS.every(hand=>{const samples=points.filter(p=>p.hand===hand);if(samples.length<10)return false;const xs=samples.map(p=>p.x).sort((a,b)=>a-b),ys=samples.map(p=>p.y).sort((a,b)=>a-b),lo=Math.floor((samples.length-1)*.03),hi=Math.floor((samples.length-1)*.97);return xs[hi]-xs[lo]>=Math.max(.06,c.shoulder*.35)&&ys[hi]-ys[lo]>=.08;}))continue;
       const xs=points.map(p=>p.x).sort((a,b)=>a-b),ys=points.map(p=>p.y).sort((a,b)=>a-b),q=(a,f)=>a[Math.floor((a.length-1)*f)];
       const left=q(xs,.03),right=q(xs,.97),top=q(ys,.03),bottom=q(ys,.97),cell=Math.min((right-left)/4,(bottom-top)/3);
       if(cell<.035||right-left<c.shoulder*.8||bottom-top<.12)continue;
-      this.calibrations[player]={...c,cx:(left+right)/2,cy:(top+bottom)/2,cell};success++;
+      this.calibrations[player]={...c,cx:(left+right)/2,cy:(top+bottom)/2,cell};success++;succeeded[player]=true;
     }
     this.resetInput();this.notice(success===this.players()?'편안한 손 범위를 맞췄어요. 빨강 L은 내 왼손, 파랑 R은 내 오른손이에요.':`${success}/${this.players()}명 범위 완료. 움직임이 작거나 가려진 자리는 어깨 기준 범위를 사용해요. 다시 맞출 수 있어요.`);
+    this.onCalibration?.(succeeded);
   }
   tick(now){
     const time=this.audio.currentTime,elapsed=this.lastFrame===null?0:Math.max(0,(now-this.lastFrame)/1000),dt=Math.min(.05,elapsed);this.lastFrame=now;

@@ -1,6 +1,7 @@
 // Original local Canvas artwork. Render coordinates never feed back into hit judgement.
 // The bright tip is the observed wrist point; the blade is a decorative representation.
 import {drawDanceBackdrop} from './saber-dance.mjs';
+import {angleDelta,bladeGeometry} from './saber-swing.mjs';
 const PALETTE = {
   left: {fill:'#eb4269', dark:'#642a59', edge:'#ff9bb1', glow:'#ff537f', name:'L'},
   right: {fill:'#228adc', dark:'#174784', edge:'#91eaff', glow:'#45ceff', name:'R'},
@@ -214,13 +215,8 @@ function drawNotes(c,r,notes,time,low,leadSeconds) {
   }
 }
 
-function bladeGeometry(x,y,cell,handName) {
-  const sx=handName==='left'?-1:1;
-  return {x,y,baseX:x+sx*cell*.20,baseY:y+cell*.65,angle:-sx*Math.atan(.20/.65),length:Math.hypot(.20,.65)*cell};
-}
-
-function saberShape(c,x,y,cell,handName,{ghost=false,low=false,selected=false}={}) {
-  const p=PALETTE[handName],g=bladeGeometry(x,y,cell,handName);
+function saberShape(c,x,y,cell,handName,{ghost=false,low=false,selected=false,bladeAngle}={}) {
+  const p=PALETTE[handName],g=bladeGeometry(x,y,cell,handName,bladeAngle);
   c.save();c.translate(x,y);c.rotate(g.angle);c.lineCap='round';
   if(ghost) {
     line(c,0,0,0,g.length,p.glow,Math.max(4,cell*.11));
@@ -272,9 +268,10 @@ function drawHand(c,r,hand,handName,time,selected,low,reduced) {
       const a=trail[i-1],b=trail[i],age=time-b.t;
       if(!finite(a.x)||!finite(a.y)||!finite(b.x)||!finite(b.y)||!finite(age)||age<0||age>TRAIL_SECONDS||b.t<=a.t||b.t-a.t>.2)continue;
       const distance=Math.hypot(b.x-a.x,b.y-a.y);
-      if(distance<.018||distance>7)continue;
-      const ga=bladeGeometry(r.x+a.x*r.cell,r.y+a.y*r.cell,r.cell,handName);
-      const gb=bladeGeometry(r.x+b.x*r.cell,r.y+b.y*r.cell,r.cell,handName);
+      const turn=Math.abs(angleDelta(a.bladeAngle,b.bladeAngle));
+      if((distance<.018&&!(b.swing&&turn>.03))||distance>7)continue;
+      const ga=bladeGeometry(r.x+a.x*r.cell,r.y+a.y*r.cell,r.cell,handName,a.bladeAngle);
+      const gb=bladeGeometry(r.x+b.x*r.cell,r.y+b.y*r.cell,r.cell,handName,b.bladeAngle);
       c.save();c.globalAlpha=(1-age/TRAIL_SECONDS)*(low?.07:.15);
       // The whole blade sweeps a translucent ribbon, not only its observed tip.
       path(c,[[ga.x,ga.y],[gb.x,gb.y],[gb.baseX,gb.baseY],[ga.baseX,ga.baseY]],p.glow);
@@ -288,10 +285,10 @@ function drawHand(c,r,hand,handName,time,selected,low,reduced) {
     for(let i=0,drawn=0;i<validTrail.length&&drawn<count;i+=stride,drawn++) {
       const {point,age}=validTrail[i];if(age<0||age>TRAIL_SECONDS)continue;
       c.save();c.globalAlpha=(1-age/TRAIL_SECONDS)*(low?.12:.25);
-      saberShape(c,r.x+point.x*r.cell,r.y+point.y*r.cell,r.cell,handName,{ghost:true,low:true});c.restore();
+      saberShape(c,r.x+point.x*r.cell,r.y+point.y*r.cell,r.cell,handName,{ghost:true,low:true,bladeAngle:point.bladeAngle});c.restore();
     }
   }
-  saberShape(c,x,y,r.cell,handName,{selected,low});
+  saberShape(c,x,y,r.cell,handName,{selected,low,bladeAngle:hand.bladeAngle});
 }
 
 function diamond(c,x,y,radius,color,angle=0) {

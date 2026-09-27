@@ -11,6 +11,7 @@ import {loadDanceImages} from './saber-dance.mjs';
 import {validateChart,generateEasyChart} from './saber-chart.mjs';
 import {createChartEditor} from './saber-editor.mjs';
 import {BUILTIN_SONGS,getBuiltinSong} from './songs.mjs';
+import {createTutorial} from './tutorial.mjs';
 
 const $=id=>document.getElementById(id);
 const stage=$('stage'),ctx=stage.getContext('2d'),camera=$('camera'),overlay=$('camera-overlay'),camCtx=overlay.getContext('2d'),audio=$('music');
@@ -31,7 +32,8 @@ const COLORS=['#85e4ce','#e4b5ed'];
 const CONNECT=[[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28]];
 const state={mode:'rhythm',profile:'standing',players:1,input:null,phase:'idle',poses:[null],stretch:[{sum:0,samples:0,hold:0},{sum:0,samples:0,hold:0}],matches:[null,null],countdownAt:0,lastResult:null};
 const rhythmAudio=new RhythmAudio();
-const feedback=new SaberFeedback({getContext:()=>rhythmAudio.context,voiceEnabled:()=>$('voice-enabled').value!=='off',voiceVolume:()=>Number($('praise-volume').value)/100,effectVolume:()=>Number($('hit-volume').value)/100,canSpeak:()=>state.phase==='playing'&&state.mode==='rhythm'&&!document.hidden&&coach.paused,players:()=>state.players});
+let tutorial=null;
+const feedback=new SaberFeedback({getContext:()=>rhythmAudio.context,voiceEnabled:()=>$('voice-enabled').value!=='off',voiceVolume:()=>Number($('praise-volume').value)/100,effectVolume:()=>Number($('hit-volume').value)/100,canSpeak:()=>((state.phase==='playing'&&state.mode==='rhythm')||(state.mode==='tutorial'&&tutorial?.phase==='playing'))&&!document.hidden&&coach.paused,players:()=>state.players});
 void feedback.load();
 const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
 const fullscreen=new FullscreenController({onExit:()=>{pauseGame();notice('전체화면을 나와 잠시 멈췄어요. 왼쪽 계속하기로 이어가세요.');},onChange:(active,message)=>{$('fullscreen-toggle').textContent=active?'⛶ 전체화면 나가기':'⛶ 전체화면';$('fullscreen-status').textContent=message;document.body.classList.toggle('native-fullscreen',active);}});
@@ -64,6 +66,11 @@ const active=()=>['playing','paused','countdown','preparing','starting','resumin
 let dance={ready:false,images:[]};
 loadDanceImages().then(loaded=>{dance={...loaded,static:$('dance-motion').value==='off'};});
 const saber=new SaberGame({stage,audio,phase:()=>state.phase,players:()=>state.players,input:()=>state.mode==='rhythm'?state.input:null,notice,onHit:event=>feedback.hit(event),onReset:()=>feedback.stop(),latency:()=>clamp(Number($('saber-latency').value)/1000,-.25,.25),range:()=>Number($('saber-range').value)||1,quality:()=>$('saber-effects').value,trainingSettings:()=>({approachSpeed:Number($('target-speed').value)||1,spacingBeats:Number($('target-spacing').value)||2}),dance:()=>dance});
+tutorial=createTutorial({stage,audio:$('tutorial-music'),players:()=>state.players,input:()=>state.input,
+  latency:()=>clamp(Number($('saber-latency').value)/1000,-.25,.25),range:()=>Number($('saber-range').value)||1,quality:()=>$('saber-effects').value,dance:()=>dance,volume:()=>musicVolume()*(coach.paused?1:.35),
+  onHit:event=>feedback.hit(event),onStop:()=>{rhythmAudio.stop();stopVoice();},
+  onSoundReady:()=>{rhythmAudio.unlock();void feedback.prepare();return fullscreen.request();},onNotice:notice,
+  onExit:calibrations=>{selectMode('rhythm');if(calibrations&&state.input==='camera')saber.calibrations=calibrations;notice('손동작 리듬에서 노래를 골라 시작하세요. 연습 전의 노래와 채보는 그대로예요.');}});
 const editor=createChartEditor({onApply:chart=>{if(active())return;chartRevision++;saber.setChart(chart);track.bpm=chart.bpm;updateSong();notice('편집한 채보를 이번 노래에 적용했어요.');},onNotice:notice});
 const builtinCharts=new Map();
 for(const song of BUILTIN_SONGS)fetch(song.chart).then(r=>{if(!r.ok)throw Error('chart');return r.json();}).then(raw=>{
@@ -73,7 +80,7 @@ for(const song of BUILTIN_SONGS)fetch(song.chart).then(r=>{if(!r.ok)throw Error(
 $('saber-calibrate').onclick=()=>saber.beginCalibration();
 $('saber-player').onchange=()=>saber.select(Number($('saber-player').value),saber.selected.hand);
 $('saber-hand').onchange=()=>saber.select(saber.selected.player,$('saber-hand').value);
-$('saber-range').addEventListener('input',()=>saber.forgetCamera());
+$('saber-range').addEventListener('input',()=>{saber.forgetCamera();tutorial.reset();});
 $('saber-latency').addEventListener('input',()=>saber.resetInput());
 $('editor-open').onclick=()=>{if(active()||songLoading||chartLoading||state.mode!=='rhythm')return;editor.open({chart:saber.chart,src:selectedAudio(),duration:track.duration});};
 $('chart-import').onclick=()=>$('chart-file').click();
@@ -99,13 +106,13 @@ function saveSettings(){
 for(const id of settingIds) $(id).addEventListener('input',saveSettings);
 for(const id of ['target-speed','target-spacing'])$(id).addEventListener('change',()=>{if(!active())saber.configure();});
 saveSettings();
-$('settings-open').onclick=()=>{if(active())pauseGame();$('settings-dialog').showModal();};$('help-open').onclick=()=>{if(active())pauseGame();$('help-dialog').showModal();};
-$('hit-preview').onclick=async()=>{await rhythmAudio.unlock();if(!$('settings-dialog').open||document.hidden)return;feedback.stop();feedback.impact({grade:{tier:4},player:0,hand:'right'});};
+$('settings-open').onclick=()=>{if(active()||tutorial.active)pauseGame();$('settings-dialog').showModal();};$('help-open').onclick=()=>{if(active()||tutorial.active)pauseGame();$('help-dialog').showModal();};
+$('hit-preview').onclick=async()=>{await rhythmAudio.unlock();if(!$('settings-dialog').open||document.hidden)return;const tier=Number($('hit-preview-grade').value);feedback.stop();feedback.impact({grade:{tier},accuracy:tier===1?20:tier===2?50:95,player:0,hand:'right'});};
 $('settings-dialog').addEventListener('close',()=>feedback.stop());
 
-function resetTracking(){state.poses=Array(state.players).fill(null);state.matches=[null,null];saber.resetInput();lastStretchTime=null;}
+function resetTracking(){state.poses=Array(state.players).fill(null);state.matches=[null,null];saber.resetInput();tutorial?.lostTracking();lastStretchTime=null;}
 function updateControls(){
-  const locked=active();
+  const locked=active(),learning=state.mode==='tutorial';
   document.body.classList.toggle('in-session',locked);
   document.body.dataset.mode=state.mode;
   document.querySelectorAll('[data-mode]').forEach(b=>b.disabled=locked||songLoading||starting||chartLoading);
@@ -120,14 +127,17 @@ function updateControls(){
   $('saber-tools').hidden=state.mode!=='rhythm';$('saber-calibrate').disabled=locked||state.input!=='camera';
   $('target-speed').disabled=$('target-spacing').disabled=locked||songLoading||chartLoading;
   $('local-song-open').disabled=locked||songLoading||chartLoading||starting;
+  $('tutorial-panel').hidden=!learning;$('song-controls').hidden=learning;$('local-song-open').hidden=learning;
+  $('play').hidden=learning;$('pause').hidden=learning;$('stop-session').hidden=learning;
   $('editor-open').disabled=locked||songLoading||chartLoading;$('chart-import').disabled=locked||songLoading||chartLoading;
   $('saber-player').querySelector('option[value="1"]').disabled=state.players<2;
-  $('stage-message').hidden=state.phase!=='idle'||state.mode==='rhythm';
+  $('stage-message').hidden=state.phase!=='idle'||state.mode!=='stretch';
   $('stage-message').querySelector('h2').textContent=state.input?'준비됐어요. 편안하게 시작하세요.':'당신의 움직임을 기다리고 있어요';
   $('stage-message').querySelector('p').textContent=state.input?'플레이 시작을 누르면 3초 뒤 시작합니다.':state.mode==='stretch'?'카메라를 켜거나 카메라 없이 안내 보기를 선택하세요.':'카메라를 켜거나 키보드 체험으로 시작하세요.';
 }
 function selectMode(mode){
   if(active()||starting||songLoading||chartLoading)return;
+  if(state.mode==='tutorial'){tutorial.leave();fullscreen.exit();}
   state.mode=mode;saber.configure();state.matches=[null,null];state.stretch=[{sum:0,samples:0,hold:0},{sum:0,samples:0,hold:0}];
   audio.pause();segmentIndex=0;audio.src=selectedAudio();audio.currentTime=0;stopVoice();rhythmAudio.stop();lastVoiceKey='';updateSong();
   document.querySelectorAll('[data-mode]').forEach(b=>{b.classList.toggle('active',b.dataset.mode===mode);b.setAttribute('aria-pressed',String(b.dataset.mode===mode));});
@@ -146,6 +156,13 @@ function selectMode(mode){
   $('guide-foot').textContent=stretch?(floor?'누운 상태로 한 세트 · 일어날 때는 천천히':'벽이나 안정된 지지물 옆 · 머리부터 발까지 화면에'):'2인 플레이는 화면의 왼쪽 P1 · 오른쪽 P2';
   $('camera-placeholder').querySelector('p').textContent=stretch?(floor?'매트와 누운 몸 전체가 보이게 카메라를 준비해 주세요.':'서 있는 몸의 머리부터 발끝까지 화면에 보이게 준비해 주세요.'):'의자에 앉아 어깨·골반·두 손이 화면에 보이게 준비해 주세요.';
   notice(stretch?'동작을 수행했을 때 한 세트가 됩니다. 통증이나 어지럼이 있으면 멈추세요.':'준비되면 시작해요. 편안한 범위에서 손을 움직이세요.');
+  const controls=document.querySelector('.controls');
+  if(mode==='tutorial'){
+    controls.parentElement.insertBefore(controls,$('tutorial-panel'));
+    $('mode-label').textContent='처음부터 배우기';$('headline').innerHTML='내 자리에서, <em>한 걸음씩</em> 배워요.';
+    $('intro').textContent='자리 · 손 범위 · 양손 · 방향 · 박자 · 계속 베기';$('stage-title').textContent='얼마루 첫걸음';
+    tutorial.enter();
+  }else controls.parentElement.insertBefore(controls,$('saber-tools'));
   updateControls();
 }
 document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>selectMode(b.dataset.mode));
@@ -186,7 +203,7 @@ $('song-file').onchange=async()=>{
   finally{probe.removeAttribute('src');probe.load();songLoading=false;$('song-file').value='';updateControls();}
 };
 $('song-bpm').onchange=()=>{if(active()||chartLoading||songLoading)return;chartRevision++;track.bpm=clamp(Number($('song-bpm').value)||112,40,240);$('song-bpm').value=track.bpm;saber.setTrack(track);updateSong();};
-async function setPlayerCount(count){state.players=count;$('players').value=String(count);saber.forgetCamera();saber.select(0,saber.selected.hand);resetTracking();if(landmarker){starting=true;updateControls();try{await landmarker.setOptions({numPoses:state.players});}catch{stopCamera();notice('인원 설정을 바꾸지 못했어요. 카메라를 다시 켜 주세요.');}finally{starting=false;}}updateControls();}
+async function setPlayerCount(count){state.players=count;$('players').value=String(count);tutorial.reset();saber.forgetCamera();saber.select(0,saber.selected.hand);resetTracking();if(landmarker){starting=true;updateControls();try{await landmarker.setOptions({numPoses:state.players});}catch{stopCamera();notice('인원 설정을 바꾸지 못했어요. 카메라를 다시 켜 주세요.');}finally{starting=false;}}updateControls();}
 $('players').onchange=()=>setPlayerCount(Number($('players').value));
 $('stretch-profile').onchange=()=>{if(active()||starting||songLoading||chartLoading)return;state.profile=$('stretch-profile').value;selectMode('stretch');};
 
@@ -216,7 +233,7 @@ async function startCamera(){
     try{landmarker=await PoseLandmarker.createFromOptions(fileset,options);delegate='GPU';}
     catch{options.baseOptions.delegate='CPU';landmarker=await PoseLandmarker.createFromOptions(fileset,options);delegate='CPU';}
     if(generation!==stopGeneration){landmarker.close();landmarker=null;return;}
-    state.input='camera';resetTracking();lastVideoTime=-1;lastInference=0;lastDetection=performance.now();
+    state.input='camera';resetTracking();tutorial.reset();lastVideoTime=-1;lastInference=0;lastDetection=performance.now();
     $('camera-placeholder').hidden=true;$('camera-corner').textContent='LIVE · LOCAL ONLY';
     notice(state.mode==='stretch'?`카메라 준비 완료. ${profile().description}. 전신이 보이게 준비하세요.`:'카메라 준비 완료. 화면에 어깨·골반·두 손이 보이면 플레이를 시작하세요.');
     await listCameras();
@@ -233,15 +250,16 @@ function stopCamera(){
   if(landmarker){landmarker.close();landmarker=null;}
   camera.srcObject=null;saber.forgetCamera();resetTracking();
   if(state.input==='camera')state.input=null;
+  tutorial.reset();
   if(state.phase==='paused'){state.phase='idle';audio.pause();audio.currentTime=0;}
   $('camera-placeholder').hidden=false;$('camera-corner').textContent='CAMERA OFF';$('tracking-label').textContent='카메라가 꺼져 있어요';$('performance').textContent='— fps';
   updateControls();
 }
 $('camera-start').onclick=startCamera;$('camera-stop').onclick=()=>{stopCamera();notice('카메라를 껐어요. 다시 켜거나 키보드로 체험할 수 있어요.');};
-$('demo').onclick=()=>{stopCamera();state.input='keyboard';notice(state.mode==='rhythm'?'먼저 손을 움직여 보세요. 마우스/방향키로 이동, Q 왼손·E 오른손, 1·2로 사람 선택. 준비되면 시작해요.':'카메라 없이도 음악과 음성 안내를 따라 한 세트를 진행할 수 있어요. 자세 유사도는 표시하지 않습니다.');$('camera-corner').textContent='CAMERA-FREE PREVIEW';updateControls();};
+$('demo').onclick=()=>{stopCamera();state.input='keyboard';tutorial.reset();notice(state.mode!=='stretch'?'먼저 손을 움직여 보세요. 마우스/방향키로 이동, Q 왼손·E 오른손, 1·2로 사람 선택. 카메라 자리 확인과 실제 보정은 하지 않는 체험이에요.':'카메라 없이도 음악과 음성 안내를 따라 한 세트를 진행할 수 있어요. 자세 유사도는 표시하지 않습니다.');$('camera-corner').textContent='CAMERA-FREE PREVIEW';updateControls();};
 
 async function beginGame(){
-  if(!state.input||active()||songLoading||starting||chartLoading||saber.calibrationTask)return;
+  if(state.mode==='tutorial'||!state.input||active()||songLoading||starting||chartLoading||saber.calibrationTask)return;
   const ticket=++gameGeneration;state.phase='preparing';updateControls();
   state.stretch=[{sum:0,samples:0,hold:0},{sum:0,samples:0,hold:0}];state.matches=[null,null];
   saber.start();rhythmAudio.stop();lastStretchTime=null;
@@ -253,6 +271,7 @@ async function beginGame(){
   state.phase='countdown';state.countdownAt=performance.now();lastVoiceKey='';speak(state.mode==='rhythm'?'start':'ready');$('countdown').hidden=false;updateControls();notice('3초 뒤 시작합니다. 편안하게 준비해 주세요.');
 }
 function pauseGame(){
+  if(state.mode==='tutorial'){fullscreen.cancelPending();tutorial.pause();return;}
   fullscreen.cancelPending();rhythmAudio.stop();stopVoice();
   if(state.phase==='playing'){audio.pause();state.phase='paused';speak('pause');notice('잠시 쉬어 가세요. 계속하기를 누르면 이어집니다.');}
   else if(state.phase==='transition'){gameGeneration++;audio.pause();state.phase='paused';notice('곡 사이에서 잠시 멈췄어요. 계속하기로 이어갑니다.');}
@@ -270,7 +289,7 @@ async function resumeGame(){
 }
 $('play').onclick=beginGame;$('pause').onclick=()=>state.phase==='paused'?resumeGame():pauseGame();
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseGame();});
-window.addEventListener('pagehide',()=>{stream?.getTracks().forEach(t=>t.stop());audio.pause();rhythmAudio.stop();stopVoice();});
+window.addEventListener('pagehide',()=>{tutorial.leave();stream?.getTracks().forEach(t=>t.stop());audio.pause();rhythmAudio.stop();stopVoice();});
 audio.addEventListener('ended',()=>{if(state.phase==='playing'&&audio.ended){if(state.mode==='stretch'&&segmentIndex<2)advanceSegment();else finishGame();}});
 audio.addEventListener('timeupdate',()=>{if(state.phase==='playing'&&state.mode==='rhythm'&&audio.currentTime>=track.duration)finishGame();});
 audio.addEventListener('waiting',()=>{saber.resetInput();if(state.phase==='playing')notice('음악을 읽는 중입니다. 파일 읽기가 끝나면 이어집니다.');});
@@ -279,10 +298,11 @@ audio.addEventListener('error',()=>{if(active())pauseGame();notice('음악 파�
 
 document.addEventListener('keydown',event=>{
   if(['INPUT','SELECT','TEXTAREA'].includes(event.target.tagName)||event.target.isContentEditable||document.querySelector('dialog[open]'))return;
-  if(event.code==='Space'){if(event.target.tagName==='BUTTON')return;event.preventDefault();if(!event.repeat)(state.phase==='paused'?resumeGame():pauseGame());return;}
+  if(event.code==='Space'){if(event.target.tagName==='BUTTON')return;event.preventDefault();if(!event.repeat){if(state.mode==='tutorial')tutorial.toggle();else state.phase==='paused'?resumeGame():pauseGame();}return;}
+  if(state.mode==='tutorial'&&tutorial.key(event,true)){event.preventDefault();return;}
   if(state.mode==='rhythm'&&saber.key(event,true))event.preventDefault();
 });
-document.addEventListener('keyup',event=>{saber.key(event,false);});
+document.addEventListener('keyup',event=>{saber.key(event,false);tutorial.key(event,false);});
 
 async function advanceSegment(){
   if(state.phase!=='playing'||state.mode!=='stretch'||segmentIndex>=2)return;
@@ -294,7 +314,7 @@ function finishGame(){
   if(state.phase==='results')return;
   audio.pause();rhythmAudio.stop();state.phase='results';fullscreen.exit();speak('finish');$('countdown').hidden=true;
   const saberResults=state.mode==='rhythm'?saber.finish():null;
-  state.lastResult={version:'0.7.0',timestamp:new Date().toISOString(),mode:state.mode,profile:state.mode==='stretch'?state.profile:null,input:state.input,duration:Math.min(sessionTime(),sessionDuration()),players:state.players,track:state.mode==='stretch'?profile().name:track.title,elimination:false,results:Array.from({length:state.players},(_,i)=>state.mode==='rhythm'?{...saberResults[i],matched:saberResults[i].hit}: {similarity:state.stretch[i].samples?Math.round(state.stretch[i].sum/state.stretch[i].samples):null,matchedSeconds:Math.round(state.stretch[i].hold),observedFrames:state.stretch[i].samples})};
+  state.lastResult={version:'0.8.0',timestamp:new Date().toISOString(),mode:state.mode,profile:state.mode==='stretch'?state.profile:null,input:state.input,duration:Math.min(sessionTime(),sessionDuration()),players:state.players,track:state.mode==='stretch'?profile().name:track.title,elimination:false,results:Array.from({length:state.players},(_,i)=>state.mode==='rhythm'?{...saberResults[i],matched:saberResults[i].hit}: {similarity:state.stretch[i].samples?Math.round(state.stretch[i].sum/state.stretch[i].samples):null,matchedSeconds:Math.round(state.stretch[i].hold),observedFrames:state.stretch[i].samples})};
   $('result-dialog').querySelector('h2').textContent=state.mode==='stretch'?'한 세트의 안내를 마쳤어요.':'한 곡을 마쳤어요.';
   $('result-subtitle').textContent=state.mode==='stretch'?`${profile().name} · 3분 45초 안내 완료. 동작 수행 여부나 운동 효과를 자동 확인한 것은 아니에요.`:`${track.title} · ${clock(track.duration)} · 편안하게 마무리하세요.`;
   $('result-cards').replaceChildren();
@@ -328,13 +348,13 @@ function infer(now){
   const fps=inferMs>85?Math.min(config().fps,8):config().fps;
   if(now-lastInference<1000/fps)return;
   const previous=lastInference;lastInference=now;lastVideoTime=camera.currentTime;
-  const captureAudioTime=audio.currentTime;
+  const captureAudioTime=state.mode==='tutorial'?tutorial.clock:audio.currentTime;
   work.width=640;work.height=Math.round(640/aspect());workCtx.drawImage(camera,0,0,work.width,work.height);
   try{
     const started=performance.now();
     const result=landmarker.detectForVideo(work,now);inferMs=performance.now()-started;inferFPS=previous?1000/(now-previous):0;lastDetection=now;
     const mirrored=result.landmarks.map(mirrorPose);
-    state.poses=state.mode==='rhythm'?saber.camera(mirrored,aspect(),now,captureAudioTime):assignPlayers(mirrored,state.players);
+    state.poses=state.mode==='rhythm'?saber.camera(mirrored,aspect(),now,captureAudioTime):state.mode==='tutorial'?tutorial.camera(mirrored,aspect(),now,captureAudioTime):assignPlayers(mirrored,state.players);
     const count=state.poses.filter(Boolean).length;
     $('tracking-label').textContent=count?`${count} / ${state.players}명 인식 · 화면 좌우 기준`:'어깨·골반·두 손을 화면에 보여 주세요';
     if(state.mode==='stretch'&&state.phase==='playing'){
@@ -380,6 +400,7 @@ function drawRobot(context,pose,x,y,w,h,color=COLORS[0]){
 function drawStage(now){
   const {w,h}=resize(stage,ctx);ctx.clearRect(0,0,w,h);
   const common={drawRobot,reduced:reducedMotion.matches,time:state.phase==='idle'?0:sessionTime()};
+  if(state.mode==='tutorial'){tutorial.draw(ctx,w,h,{reduced:reducedMotion.matches});return;}
   if(state.mode==='rhythm'){saber.draw(ctx,w,h,{reduced:reducedMotion.matches});return;}
   if(state.phase==='idle'){
     drawWelcome(ctx,w,h,{...common,stretch:state.mode==='stretch',profile:state.profile,pose:routinePose(currentExercise(),state.profile)});return;
@@ -392,6 +413,7 @@ function drawCamera(){
   if(!stream||camera.readyState<2)return;
   const scale=Math.min(w/camera.videoWidth,h/camera.videoHeight),vw=camera.videoWidth*scale,vh=camera.videoHeight*scale,ox=(w-vw)/2,oy=(h-vh)/2;
   camCtx.save();camCtx.translate(ox+vw,oy);camCtx.scale(-1,1);camCtx.drawImage(camera,0,0,vw,vh);camCtx.restore();
+  if(state.mode==='tutorial')tutorial.drawCameraGuide(camCtx,ox,oy,vw,vh);
   if(state.players===2){camCtx.fillStyle='#11182745';camCtx.fillRect(ox+vw*.47,oy,vw*.06,vh);camCtx.strokeStyle='#aebcce88';camCtx.setLineDash([5,5]);camCtx.beginPath();camCtx.moveTo(w/2,0);camCtx.lineTo(w/2,h);camCtx.stroke();camCtx.setLineDash([]);text(camCtx,'P1',ox+15,22,11,COLORS[0]);text(camCtx,'P2',ox+vw-30,22,11,COLORS[1]);}
   state.poses.forEach((pose,i)=>{
     if(!pose)return;
@@ -402,6 +424,7 @@ function drawCamera(){
   });
 }
 function updateScores(){
+  if(state.mode==='tutorial'){tutorial.paint();if(stream)$('performance').textContent=`${Math.round(inferFPS)} fps · ${Math.round(inferMs)} ms · ${delegate}`;return;}
   for(let i=0;i<state.players;i++){
     const n=i+1,score=saber.sessions[i].counts;
     $(`p${n}-points`).textContent=state.mode==='rhythm'?String(score.hit):state.matches[i]===null?'—':`${state.matches[i]}%`;
@@ -417,7 +440,7 @@ function frame(now){
   // Always schedule the next frame, even if one draw/inference encounters an error.
   requestAnimationFrame(frame);
   const frameGap=now-lastRender;lastRender=now;
-  if(frameGap>1000&&state.phase==='playing')pauseGame();
+  if(frameGap>1000&&(state.phase==='playing'||tutorial.phase==='playing'))pauseGame();
   if(state.phase==='countdown'){
     const left=3-Math.floor((now-state.countdownAt)/1000);$('countdown').textContent=Math.max(left,1);
     if(left<=0){const ticket=gameGeneration;state.phase='starting';updateControls();$('countdown').hidden=true;audio.play().then(()=>{if(ticket!==gameGeneration||state.phase!=='starting')return;if(document.hidden){pauseGame();return;}state.phase='playing';saber.resetInput();updateControls();notice(state.mode==='rhythm'?'빨강 L은 내 왼손, 파랑 R은 내 오른손. 가까운 블록을 화살표 방향으로 베어요.':'위쪽 마루의 움직임을 편안하게 따라 하세요. 중간중간 쉬어 갑니다.');}).catch(()=>{if(ticket===gameGeneration){state.phase='idle';updateControls();notice('재생이 멈췄어요. 플레이 시작을 다시 눌러 주세요.');}});}
@@ -431,6 +454,7 @@ function frame(now){
     else if(state.mode==='rhythm'&&audio.currentTime>=track.duration)finishGame();
   }
   if(state.mode==='rhythm')saber.tick(now);
+  if(state.mode==='tutorial')tutorial.tick(now);
   drawStage(now);drawCamera();
   if(now-lastUI>100){lastUI=now;updateScores();}
 }

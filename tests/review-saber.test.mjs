@@ -318,7 +318,7 @@ test('a normal 650ms rendering stall does not erase earlier session outcomes',t=
 test('successful comfortable-range calibration stays isotropic and fixed until body relocation',t=>{
   const {game,state}=gameFixture(t);state.input='camera';const p=person();
   game.camera([p],4/3,1000,0);const base={...game.calibrations[0]};
-  const points=Array.from({length:40},(_,i)=>({x:base.anchorX+(i%2? .4:-.4),y:i%4<2?.3:.9}));
+  const points=['left','right'].flatMap(hand=>Array.from({length:40},(_,i)=>({x:base.anchorX+(i%2? .4:-.4),y:i%4<2?.3:.9,hand})));
   game.calibrationTask={points:[points,[]],until:0};game.finishCalibration();
   const calibrated={...game.calibrations[0]};near(calibrated.cell,.2);near(calibrated.cy,.6);
   assert.equal(game.calibrationTask,null);assert.equal(game.hands[0].left.display().valid,false);
