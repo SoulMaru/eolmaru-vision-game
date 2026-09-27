@@ -92,3 +92,5 @@
 - H10: 새블래스터효과의실제스피커타격감과음악/칭찬균형청취대기.21PCM조건/최대피크정상은사람취향승인이아니다.설정에서타격음미리듣기/별도음량사용. 검색어: Web Audio transient sound design loudness limiter mix.
 - H11: 바로가기는프로젝트의고정절대경로를열며폴더이동은자동추적하지않는다.이폴더파일업데이트는반영한다.폴더이동시기존링크를정리한뒤새폴더tools/install-shortcut.ps1로재설치. 자동Git pull/배포서버/업데이터서비스없음.
 - 긴곡의앞150초자동사용과120초미만거부는현재한곡2~3분정책이다.임의구간선택/자동BPM·비트분석은미구현이며H06을따른다.
+
+- H12 (개발 저장소): 0.7 구현 커밋 때 Git 자동 geometric-repack이 `could not write multi-pack-index: Permission denied`를 출력했다. 커밋과 push는 성공했고 5ddc1879ee2d0cd76eb2d495fe0fe06dfa07a9b2의 로컬/원격 main 일치를 직접 확인했다. 게임 실행 오류와 구분한다. 원인은 미확정이며 기존 Git pack/권한을 임의 삭제·변경하지 않았다. 재발하면 다른 Git 프로세스의 파일 사용과 해당 경로 권한을 확인한다. 검색어: Git Windows multi-pack-index permission denied geometric repack.
