@@ -1,55 +1,30 @@
 <!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#111421"><meta name="description" content="손끝으로 리듬을, 온몸으로 활력을. 무료 로컬 카메라 리듬·스트레칭 게임.">
-  <title>얼마루 비전 — 움직임이 놀이가 되는 순간</title>
-  <link rel="icon" href="/assets/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="/style.css">
-</head>
-<body>
-<div class="app-shell">
-  <aside class="sidebar">
-    <a class="brand" href="/" aria-label="얼마루 비전 홈"><img src="/assets/icon.svg" alt=""><span>얼마루 <b>비전</b><small>EOLMARU VISION</small></span></a>
-    <p class="nav-label">오늘의 플레이</p>
-    <nav aria-label="게임 선택">
-      <button class="mode active" data-mode="rhythm" aria-pressed="true"><span class="nav-icon">♫</span><span>손동작 리듬<small>앉아서 손만 · 선택한 한 곡</small></span><span class="mode-dot"></span></button>
-      <button class="mode" data-mode="stretch" aria-pressed="false"><span class="nav-icon">✧</span><span>전신 스트레칭<small>목부터 발목까지 · 한 세트</small></span><span class="mode-dot"></span></button>
-    </nav>
-    <div class="side-rule"></div>
-    <div id="stretch-options" hidden><label class="nav-label" for="stretch-profile">전신 스트레칭 자세</label><select id="stretch-profile"><option value="standing">서서 전신 · 기본</option><option value="floor">누워서 전신 · 매트</option><option value="couple">커플 함께 · 나란히 서서</option></select></div>
-    <label class="nav-label" for="players">함께할 사람</label>
-    <select id="players"><option value="1">혼자 즐기기 · 1인</option><option value="2">함께 즐기기 · 2인</option></select>
-    <label class="nav-label" for="song-select">이번에 들을 노래</label>
-    <select id="song-select"><option value="set" disabled>전신 세트 · 3곡 × 75초</option><option value="builtin">Maru Flow · 2분 30초</option><option value="local">내 컴퓨터의 노래…</option></select><button id="song-reselect" class="text-button" hidden>다른 노래 파일 선택</button><input id="song-file" type="file" accept="audio/*" hidden><div id="custom-tempo" hidden><label class="nav-label" for="song-bpm">선택한 곡 BPM</label><input id="song-bpm" type="number" min="40" max="240" value="112"><small>리듬 모드에서 곡의 BPM을 입력해 주세요.<br>전신 세트는 준비된 3곡을 사용해요.</small></div>
-    <div class="sidebar-bottom">
-      <div class="local-note"><span class="status-dot"></span><div>내 컴퓨터에서만<small>카메라 영상은 전송·저장하지 않아요.</small></div></div>
-      <button class="text-button" id="settings-open">⚙ 플레이 설정</button>
-      <p class="version">MVP 0.2 · ONE SONG, JUST MOVE</p>
-    </div>
-  </aside>
-  <main>
-    <header class="topbar"><span class="breadcrumb">플레이그라운드 <span>/</span> <b id="mode-label">비전 리듬</b></span><div class="top-meta"><span class="chip"><i></i> LOCAL PLAY</span><button id="help-open" class="icon-button" aria-label="플레이 방법">?</button></div></header>
-    <section class="welcome" aria-label="환영">
-      <div><p class="eyebrow">A LITTLE MOVE, A BRIGHTER DAY</p><h1 id="headline">움직임이 <em>리듬</em>이 되는 순간.</h1><p id="intro">마루와 함께, 오늘은 가볍게 몸을 움직여 볼까요?</p></div>
-      <span class="welcome-label">MEET YOUR COACH, MARU ✦</span>
-    </section>
-    <div class="session-bar"><div class="song-art">♫</div><div class="song-name"><strong><b id="song-title">Maru Flow</b> <span id="song-source">ORIGINAL</span></strong><small id="song-description">얼마루 음악엔진 · 112 BPM · 2분 30초</small></div><span class="pill">한 곡, 편안하게</span><span id="session-clock">00:00 <span>/ 02:30</span></span></div>
-    <section class="play-stage" aria-label="상단 게임과 동작 예시">
-      <div class="panel-header"><div><span class="section-number">01</span><strong id="stage-title">리듬 스테이지</strong><span id="stage-subtitle">박자에 맞춰 화살표 방향으로 손을 뻗어요</span></div><span class="small-tag" id="input-badge">입력 대기</span></div>
-      <div class="stage-canvas-wrap"><canvas id="stage" aria-label="리듬 노트와 운동 예시 캐릭터"></canvas><div id="stage-message" class="stage-message"><span class="spark">✦</span><h2>당신의 움직임을 기다리고 있어요</h2><p>카메라를 켜거나 키보드 체험으로 시작하세요.</p></div><div id="countdown" class="countdown" hidden></div></div>
-      <div class="score-strip"><div class="player-score" id="p1-score"><span class="player-token">P1</span><span id="p1-status">준비됐나요?</span><strong id="p1-points">0</strong><small id="p1-detail">박자 일치</small></div><div class="player-score p2" id="p2-score" hidden><span class="player-token">P2</span><span id="p2-status">함께 움직여요</span><strong id="p2-points">0</strong><small id="p2-detail">박자 일치</small></div></div>
-      <progress id="progress" max="150" value="0" aria-label="플레이 진행률"></progress>
-    </section>
-    <section class="camera-panel" aria-label="하단 카메라 화면">
-      <div class="panel-header"><div><span class="section-number">02</span><strong>나의 움직임</strong><span id="tracking-label">카메라가 꺼져 있어요</span></div><div class="camera-meta"><span id="performance">— fps</span><button id="camera-stop" class="text-button" hidden>카메라 끄기</button></div></div>
-      <div class="camera-body"><div class="camera-view"><video id="camera" autoplay playsinline muted hidden></video><canvas id="camera-overlay" aria-label="카메라와 인식된 몸의 관절"></canvas><div id="camera-placeholder"><div class="camera-glyph">⌁</div><strong>이 공간이 나만의 플레이그라운드</strong><p>어깨부터 골반까지, 두 손이 화면에 보이게 서 주세요.</p></div><span class="camera-corner" id="camera-corner">CAMERA OFF</span></div><div class="camera-guide"><span class="guide-kicker">HOW TO MOVE</span><h3 id="guide-title">손을 가슴 앞으로 모은 뒤<br>가볍게 뻗어 주세요.</h3><div class="directions"><kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd></div><p id="guide-description">한 번 뻗고 가슴 앞으로 돌아오면 다음 박자를 칠 수 있어요.</p><span class="guide-foot" id="guide-foot">2인 플레이는 화면의 왼쪽 P1 · 오른쪽 P2</span></div></div>
-    </section>
-    <footer class="controlbar"><div class="controls"><button class="primary-button" id="camera-start">◉ 카메라 켜기</button><button class="primary-button mint" id="play" disabled>▶ 플레이 시작</button><button class="secondary-button" id="pause" disabled>일시정지</button><button class="secondary-button" id="stop-session" disabled>그만하기</button><button class="text-button" id="demo">키보드로 체험 →</button></div><p id="notice" role="status" aria-live="polite">준비되면 시작해요. 편안한 범위에서 움직이세요.</p></footer>
-  </main>
-</div>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#172537"><meta name="description" content="소리를 듣고 손끝으로 답하는 마루 리듬쇼. 무료 로컬 전신 스트레칭."><title>얼마루 비전 — 마루 리듬쇼</title><link rel="icon" href="/assets/icon.svg" type="image/svg+xml"><link rel="stylesheet" href="/style.css"></head>
+<body><div class="app-shell">
+<aside class="sidebar" aria-label="게임 메뉴와 모든 조작">
+  <a class="brand" href="/" aria-label="얼마루 비전 홈"><img src="/assets/icon.svg" alt=""><span>얼마루 <b>비전</b><small>MARU RHYTHM CLUB</small></span></a>
+  <nav aria-label="게임 선택"><button class="mode" data-mode="rhythm" aria-pressed="false"><span class="nav-icon">♫</span><span>손동작 리듬<small>앉아서 손만 · 한 곡의 리듬쇼</small></span></button><button class="mode active" data-mode="stretch" aria-pressed="true"><span class="nav-icon">✧</span><span>전신 스트레칭<small>서서 · 누워서 · 커플</small></span></button></nav>
+  <div class="setup-controls">
+    <div id="stretch-options"><label for="stretch-profile">스트레칭 자세</label><select id="stretch-profile"><option value="standing">서서 전신 · 기본</option><option value="floor">누워서 전신 · 매트</option><option value="couple">커플 함께 · 나란히 서서</option></select></div>
+    <label for="players">함께할 사람</label><select id="players"><option value="1">혼자 즐기기 · 1인</option><option value="2">함께 즐기기 · 2인</option></select>
+    <label for="song-select">이번에 들을 노래</label><select id="song-select"><option value="set" disabled>전신 세트 · 3곡 × 75초</option><option value="builtin">Maru Flow · 2분 30초</option><option value="local">내 컴퓨터의 노래…</option></select><button id="song-reselect" class="text-button" hidden>다른 노래 파일 선택</button><input id="song-file" type="file" accept="audio/*" hidden><div id="custom-tempo" hidden><label for="song-bpm">선택한 곡 BPM</label><input id="song-bpm" type="number" min="40" max="240" value="112"><small>곡의 BPM을 입력해 주세요.</small></div>
+  </div>
+  <div class="controls" aria-label="플레이 조작"><button class="primary-button" id="camera-start">◉ 카메라 켜기</button><button class="text-button" id="camera-stop" hidden>카메라 끄기</button><button class="primary-button mint" id="play" disabled>▶ 플레이 시작</button><div class="button-pair"><button class="secondary-button" id="pause" disabled>일시정지</button><button class="secondary-button" id="stop-session" disabled>그만하기</button></div><button class="text-button" id="demo">카메라 없이 안내 보기 →</button></div>
+  <div class="side-tools"><button class="secondary-button" id="fullscreen-toggle">⛶ 전체화면</button><small id="fullscreen-status" role="status">시작하면 전체화면으로 전환해요</small><div class="button-pair"><button class="text-button" id="settings-open">⚙ 설정</button><button class="text-button" id="help-open">? 플레이 방법</button></div></div>
+  <div class="camera-guide"><h3 id="guide-title">두 발로 편안하게 서 주세요.</h3><div class="directions"><kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd></div><p id="guide-description"></p><small id="guide-foot"></small></div>
+  <p id="notice" role="status" aria-live="polite">준비되면 시작해요.</p>
+  <div class="sidebar-bottom"><span class="status-dot"></span> 무료 · 내 컴퓨터에서만 <small>영상 저장·전송 없음 · MVP 0.3</small></div>
+</aside>
+<main aria-label="게임 무대">
+  <header class="topbar"><div><span class="eyebrow">LET YOUR BODY PLAY</span><h1 id="headline">한 세트, <em>온몸을</em> 가볍게.</h1></div><div class="mode-meta"><b id="mode-label">전신 스트레칭 세트</b><span id="intro"></span></div></header>
+  <section class="play-stage" aria-label="상단 게임과 동작 예시">
+    <div class="panel-header"><div><span class="live-dot"></span><strong id="stage-title">마루의 움직임 가이드</strong><span id="stage-subtitle"></span></div><span class="small-tag" id="input-badge">입력 대기</span></div>
+    <div class="stage-canvas-wrap"><canvas id="stage" aria-label="마루 리듬쇼와 운동 예시 캐릭터"></canvas><div id="stage-message" class="stage-message"><span class="eyebrow">READY WHEN YOU ARE</span><h2>마루와 함께 움직여요</h2><p>왼쪽에서 카메라 또는 안내 보기를 선택하세요.</p></div><div id="countdown" class="countdown" hidden></div></div>
+    <div class="stage-bottom"><div class="song-name"><strong id="song-title">Maru Flow</strong><span id="song-source">ORIGINAL</span><small id="song-description"></small></div><span id="session-clock">00:00 <span>/ 03:45</span></span></div><progress id="progress" max="225" value="0" aria-label="플레이 진행률"></progress>
+  </section>
+  <section class="camera-panel" aria-label="하단 카메라 화면"><div class="camera-header"><strong>나의 움직임 <span id="camera-corner">CAMERA OFF</span></strong><span id="tracking-label">카메라가 꺼져 있어요</span><span id="performance">— fps</span></div><div class="camera-view"><video id="camera" autoplay playsinline muted hidden></video><canvas id="camera-overlay" aria-label="카메라와 인식된 몸의 관절"></canvas><div id="camera-placeholder"><span class="camera-glyph">◎</span><strong>이곳에 나의 움직임이 보여요</strong><p>서 있는 몸의 머리부터 발끝까지 화면에 준비해 주세요.</p></div><div class="score-strip"><div class="player-score" id="p1-score"><span class="player-token">P1</span><span id="p1-status">준비</span><strong id="p1-points">—</strong><small id="p1-detail"></small></div><div class="player-score p2" id="p2-score" hidden><span class="player-token">P2</span><span id="p2-status">준비</span><strong id="p2-points">—</strong><small id="p2-detail"></small></div></div></div></section>
+</main></div>
 <dialog id="settings-dialog"><form method="dialog"><div class="dialog-title"><h2>플레이 설정</h2><button class="icon-button" value="close" aria-label="설정 닫기">×</button></div><label for="camera-select">사용할 카메라</label><select id="camera-select"><option value="">기본 카메라</option></select><small>카메라를 끈 상태에서 선택하고 다시 켜 주세요.</small><label for="quality">컴퓨터 부담</label><select id="quality"><option value="12">균형 · 초당 최대 12회 인식</option><option value="8">절전 · 초당 최대 8회 인식</option><option value="20">부드럽게 · 초당 최대 20회 인식</option></select><label for="sensitivity">손 뻗기 감도 <output id="sensitivity-value">1.0</output></label><input id="sensitivity" type="range" min="0.8" max="1.4" step="0.1" value="1"><small>높이면 더 작은 움직임으로 반응해요.</small><label for="offset">소리·동작 보정 <output id="offset-value">0 ms</output></label><input id="offset" type="range" min="-300" max="300" step="10" value="0"><small>동작 판정이 늦게 느껴지면 + 방향으로 조정해요.</small><label for="voice-enabled">한국어 코치 음성</label><select id="voice-enabled"><option value="on">켜기 · 로컬 음성</option><option value="off">끄기</option></select><label for="voice-volume">코치 목소리 크기 <output id="voice-volume-value">80%</output></label><input id="voice-volume" type="range" min="0" max="100" value="80"><small>안내가 나오는 동안 음악은 잠시 작아져요.</small><label for="volume">음악 크기 <output id="volume-value">65%</output></label><input id="volume" type="range" min="0" max="100" value="65"><p class="dialog-note">영상은 기록하지 않습니다. 설정만 이 브라우저에 보관됩니다.</p><button class="primary-button" value="save">완료</button></form></dialog>
-<dialog id="help-dialog"><form method="dialog"><div class="dialog-title"><h2>처음이라면, 이렇게</h2><button class="icon-button" aria-label="도움말 닫기">×</button></div><ol><li><strong>공간을 준비해요.</strong> 두 손을 벌려도 주변에 닿지 않는 곳에서 카메라를 켜세요.</li><li><strong>손 리듬은 의자에 앉아 손만 사용해요.</strong> 손은 가슴 앞에서 출발해요. 화살표가 아래 판정선에 닿을 때 위·아래·옆으로 한 번 뻗고 돌아오세요.</li><li><strong>함께라면 좌우로.</strong> 화면 왼쪽이 P1, 오른쪽이 P2예요. 가운데를 넘나들면 인식이 잠시 멈출 수 있어요.</li><li><strong>전신 스트레칭.</strong> 서서 하는 전신 동작이 기본이에요. 누워서 하는 세트, 나란히 서서 따라 하는 커플 세트도 고를 수 있어요. 서로 당기거나 밀지 않아요. 3곡을 75초씩, 총 3분 45초 진행해요. 목과 하체는 시간 안내만 제공해요.</li></ol><p>키보드: P1은 A(←) W(↑) S(↓) D(→), P2는 방향키. 스페이스는 일시정지.</p><p class="dialog-note">일치율은 카메라로 본 게임용 유사도예요. 건강 평가가 아닙니다. 통증이나 어지럼이 있으면 멈추세요.</p><button class="primary-button">알겠어요</button></form></dialog>
+<dialog id="help-dialog"><form method="dialog"><div class="dialog-title"><h2>처음이라면, 이렇게</h2><button class="icon-button" aria-label="도움말 닫기">×</button></div><ol><li><strong>공간을 준비해요.</strong> 두 손을 벌려도 주변에 닿지 않는 곳에서 카메라를 켜세요.</li><li><strong>손 리듬은 의자에 앉아 손만 사용해요.</strong> 손은 가슴 앞에서 출발해요. 먼저 시범 소리와 방향을 보고, 지금 신호에 맞춰 위·아래·옆으로 한 번 뻗고 돌아오세요.</li><li><strong>함께라면 좌우로.</strong> 화면 왼쪽이 P1, 오른쪽이 P2예요. 가운데를 넘나들면 인식이 잠시 멈출 수 있어요.</li><li><strong>전신 스트레칭.</strong> 서서 하는 전신 동작이 기본이에요. 누워서 하는 세트, 나란히 서서 따라 하는 커플 세트도 고를 수 있어요. 서로 당기거나 밀지 않아요. 3곡을 75초씩, 총 3분 45초 진행해요. 목과 하체는 시간 안내만 제공해요.</li></ol><p>키보드: P1은 A(←) W(↑) S(↓) D(→), P2는 방향키. 스페이스는 일시정지.</p><p class="dialog-note">일치율은 카메라로 본 게임용 유사도예요. 건강 평가가 아닙니다. 통증이나 어지럼이 있으면 멈추세요.</p><button class="primary-button">알겠어요</button></form></dialog>
 <dialog id="result-dialog"><div class="result-spark">✦</div><p class="eyebrow">YOU SHOWED UP. THAT COUNTS.</p><h2>한 곡을 마쳤어요.</h2><p id="result-subtitle"></p><div id="result-cards"></div><div class="result-actions"><button id="export-result" class="secondary-button">이번 기록 저장</button><button id="retry" class="primary-button mint">다시 즐기기</button></div></dialog>
-<audio id="music" src="/audio/maru-flow.ogg" preload="auto"></audio>
-<script type="module" src="/src/app.mjs"></script>
-</body></html>
+<audio id="music" src="/audio/maru-flow.ogg" preload="auto"></audio><script type="module" src="/src/app.mjs"></script></body></html>

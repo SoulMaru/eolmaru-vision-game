@@ -1,17 +1,12 @@
 {
-  "checkedAt": "2026-09-27T01:43:41.943Z",
-  "runtimeFiles": 54,
-  "runtimeBytes": 35609779,
+  "checkedAt": "2026-09-27T02:20:38.402Z",
+  "runtimeFiles": 56,
+  "runtimeBytes": 33573975,
   "missing": [],
   "duplicates": [],
   "voiceErrors": [],
   "externalRuntimeReferences": [],
   "files": [
-    {
-      "file": "public/assets/maru-garden.png",
-      "bytes": 2050612,
-      "sha256": "bd27b80424df44a5cb2777f474119260a6c3b41a60715c73856f03527a291b39"
-    },
     {
       "file": "public/assets/icon.svg",
       "bytes": 410,
@@ -244,13 +239,13 @@
     },
     {
       "file": "public/index.html",
-      "bytes": 11102,
-      "sha256": "4cd38e5554613c4fe2c7a695e07fb8399e7117f093bcb8c465b1b11c91937f0f"
+      "bytes": 9983,
+      "sha256": "cc74450572cadc43e88e600994b1e57ae7b04ce6686650520eba4d364365654d"
     },
     {
       "file": "public/style.css",
-      "bytes": 13515,
-      "sha256": "5272710735a3269f641c350bf85673346a30ccf88f7861fc0a8504a67f15b70c"
+      "bytes": 12089,
+      "sha256": "018d6517d01e6ad9545121710a3626c04e0e9c6364772ae45944bb5df8a831ac"
     },
     {
       "file": "src/core.mjs",
@@ -259,8 +254,8 @@
     },
     {
       "file": "src/app.mjs",
-      "bytes": 39322,
-      "sha256": "7b07fd5c4a6893778bec2135c3a4f43fd331b05f212bded918773b29c6ca9dda"
+      "bytes": 38284,
+      "sha256": "4c28fa8c55825cc3412f70d3d64e72e76068c41a362897e529754ac632a2bc98"
     },
     {
       "file": "src/routine.mjs",
@@ -276,6 +271,21 @@
       "file": "src/figures.mjs",
       "bytes": 2887,
       "sha256": "888d096f4bcbe64fb7e4ee819450fc1a3fbbdad5d2dfd0f6c7c22f5b4f2f19ec"
+    },
+    {
+      "file": "src/show.mjs",
+      "bytes": 4217,
+      "sha256": "b96e8a0355357251362bf48f8db603bf0aa5a4613b9773c70f823aaca25f3738"
+    },
+    {
+      "file": "src/fullscreen.mjs",
+      "bytes": 2543,
+      "sha256": "c75d5691a0da1bf2f8640800515159f2ef354957c7cd010c687a6c595ede494a"
+    },
+    {
+      "file": "src/show-render.mjs",
+      "bytes": 11631,
+      "sha256": "2836b724e27589e5ae6cf528d8ac94914e6bc8af262bf7559ad529a8aefc70a0"
     }
   ]
 }

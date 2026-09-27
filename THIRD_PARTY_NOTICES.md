@@ -14,3 +14,5 @@ Project source code is MIT, except third-party components which retain their own
 | Exercise references | NHS and NHS hospital patient guidance | Used as references for original game instructions. No reference photos or motion-capture datasets copied. The routine is not endorsed or clinically validated by those providers. Links in `docs/RESEARCH.md`. |
 
 Reference checkouts in `references/` are local only and ignored by Git. Download URLs and exact commits are recorded in the research log. The original reference games have separate network/music dependencies and were not claimed to run fully offline on this PC.
+
+0.3 reference video: user supplied a local promotional video for design study only. No frames, audio, characters, logos or source footage from that video are distributed. The three scene illustrations and Web Audio cue tones are original project code.

@@ -6,6 +6,12 @@
 
 사용자가 서기 기본 + 누워서 + 커플을 명시했고, 의자 손동작은 리듬 전용이라고 정정했다. 최종 구현은 세 스트레칭 프로필을 각각 13단계/225초로 제공한다. floor는 전 구간 match:null, couple은 2인 자동 설정/잠금이며 서로 당기는 보조 동작을 넣지 않았다. 초기 의자 스트레칭 가정은 폐기했다.
 
+## 최신 0.3 요구
+
+사용자 참고 영상의 큰 장면·소리예고·입력반응 설계로 마루 리듬쇼를 추가했다. 모든 일반 조작은 왼쪽, 상단 큰 무대/하단 카메라는 오른쪽 뷰포트 안에 있다. 세 테마는 한 곡 길이의 1/3씩 자동 전환된다. 소리/동작은 오디오 시계이며 16박 중 8박 시범/8박 응답, 최소2박 간격이다. 80종/30종 게임,4인,원작RPG는 구현 범위가 아니다.
+
+시작 버튼 동기 구간에서 audio.play → AudioContext.resume → requestFullscreen을 호출한다. 음악이 준비되면 즉시 pause/0으로 돌리고 전체화면 결과 뒤 카운트다운한다. Esc/fullscreenchange는 pauseGame, 완료/그만하기는 silent exit. 거절은 창 화면으로 계속 진행하며 실제 전체화면이라고 표시하지 않는다. 늦은 전체화면 성공/exit 경합은 세대토큰·desired·exitPromise로 처리한다. exit 중 재요청은 false와 재시도 안내를 반환한다.
+
 ## 위치와 시작
 
 - 프로젝트: `D:\3_GosranAI\8.visiongame\eolmaru-vision-game`
@@ -21,13 +27,17 @@
 | src/core.mjs | 신뢰도·좌우 슬롯·미러·네 방향 재무장·박자 판정·상체 유사도 |
 | src/routine.mjs | 225초 세트, 3곡 목록, 프로필별 시간/휴식 조회 |
 | src/routine-profiles.mjs / figures.mjs | 서기·누워서·커플 동작 데이터 / 창작 관절 예시 |
+| src/show.mjs | 16박 호출/응답 채보·3막·시계 기반 효과음 예약/취소 |
+| src/show-render.mjs | 새 Canvas 풍경·반응·큰 자세 예시·작은 화면 재배치 |
+| src/fullscreen.mjs | 실제 Fullscreen API/해제/거절/경합 상태 |
 | src/app.mjs | 카메라/MediaPipe·음악 시계·곡 전환·한국어 코치·UI·로컬 곡 선택 |
 | public/index.html / style.css | 한국어 화면·설정·기본 창작 이미지 |
 | tools/server.mjs / launch.ps1 | 로컬 서버와 Windows 시작 |
 | tools/setup.mjs | 고정 MediaPipe 배포 파일과 로컬 모델 준비 |
 | tools/music-compose.py | 기존 F 함수 + 자체 작곡, 150초3곡 재생성 |
-| tools/voice-generate.mjs / voice-sapi.ps1 | F SAPI로 19코치 음성 제작, F 없는 PC는 로컬 어댑터 |
+| tools/voice-generate.mjs / voice-sapi.ps1 | F SAPI로 31코치 음성 제작, F 없는 PC는 로컬 어댑터 |
 | tests/review-*.test.mjs | 검토엔진의 독립 회귀 검사 |
+| tests/browser-show.js | 실제 전체화면/해제/거절, 왼쪽 조작, 무대 크기, 로컬 자산 |
 | tests/browser-profiles.js | 기본 서기·손 리듬 분리, 커플 2인 잠금, 누운 세트 종료 |
 | tests/browser-flow.js | 브라우저 한곡/225초전환·버튼 초점 입력·카메라 없는 무점수 검사 |
 
@@ -50,3 +60,5 @@
 ## 작업 규칙
 
 AGENTS.md와 PLAN/REVIEW/TEST_RESULTS를 먼저 읽는다. F 원본 제작소는 수정하지 않는다. 참고 저장소/설치환경의 중복과 배포 자산의 중복은 구별한다. 변경 후 필요한 회귀만 실행하고, 출처/판단/실측을 분리해 이력을 업데이트한다.
+
+0.3 검증: 독립41개, 브라우저14+8+9개. 실제 headed Chrome에서 document.fullscreenElement=HTML, inner/outer/screen 모두1920×1080, Escape에일시정지 및계속하기재진입 확인. test-results/의 캡처·사용자참고영상추출물은 공개하지 않는다. 초기 원화는 docs/art/maru-garden.png로 옮겨 실행 시 요청하지 않는다.

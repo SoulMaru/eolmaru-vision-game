@@ -4,6 +4,9 @@
   const delay=ms=>new Promise(r=>setTimeout(r,ms));
   const until=async(fn,timeout=8000)=>{const start=performance.now();while(!fn()){if(performance.now()-start>timeout)throw Error('Timed out');await delay(50);}};
   const check=(name,ok)=>{if(!ok)throw Error(name);checks.push(name);};
+  if($('result-dialog').open)$('retry').click();
+  if(!$('stop-session').disabled)$('stop-session').click();
+  document.querySelector('[data-mode="rhythm"]').click();
   $('players').value='2';$('players').dispatchEvent(new Event('change'));
   $('demo').click();$('play').click();await until(()=>!$('pause').disabled);
   check('two player score panels visible',!$('p2-score').hidden);

@@ -1,5 +1,9 @@
-import {DIRECTIONS,ARROWS,clamp,mirrorPose,assignPlayers,generateChart,createScore,judgeHit,expireNotes,GestureTracker,poseSimilarity,validateTrackDuration} from './core.mjs';
+import {clamp,mirrorPose,assignPlayers,createScore,judgeHit,expireNotes,GestureTracker,poseSimilarity,validateTrackDuration} from './core.mjs';
 import {SET_TRACKS,SET_DURATION,ROUTINE_PROFILES,routineAt,routinePose} from './routine.mjs';
+
+import {generateShowChart,RhythmAudio} from './show.mjs';
+import {drawRhythmShow,drawWelcome,drawStretchWorld} from './show-render.mjs';
+import {FullscreenController} from './fullscreen.mjs';
 
 const $=id=>document.getElementById(id);
 const stage=$('stage'),ctx=stage.getContext('2d'),camera=$('camera'),overlay=$('camera-overlay'),camCtx=overlay.getContext('2d'),audio=$('music');
@@ -18,7 +22,11 @@ coach.addEventListener('ended',restoreMusic);coach.addEventListener('error',rest
 const work=document.createElement('canvas'),workCtx=work.getContext('2d',{willReadFrequently:true});
 const COLORS=['#85e4ce','#e4b5ed'];
 const CONNECT=[[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28]];
-const state={mode:'rhythm',profile:'standing',players:1,input:null,phase:'idle',poses:[null],scores:[createScore(),createScore()],gestures:[new GestureTracker(),new GestureTracker()],stretch:[{sum:0,samples:0,hold:0},{sum:0,samples:0,hold:0}],matches:[null,null],chart:generateChart(),countdownAt:0,flash:[null,null],lastResult:null};
+const state={mode:'rhythm',profile:'standing',players:1,input:null,phase:'idle',poses:[null],scores:[createScore(),createScore()],gestures:[new GestureTracker(),new GestureTracker()],stretch:[{sum:0,samples:0,hold:0},{sum:0,samples:0,hold:0}],matches:[null,null],chart:generateShowChart(),countdownAt:0,flash:[null,null],lastResult:null};
+const rhythmAudio=new RhythmAudio();
+const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+const fullscreen=new FullscreenController({onExit:()=>{pauseGame();notice('전체화면을 나와 잠시 멈췄어요. 왼쪽 계속하기로 이어가세요.');},onChange:(active,message)=>{$('fullscreen-toggle').textContent=active?'⛶ 전체화면 나가기':'⛶ 전체화면';$('fullscreen-status').textContent=message;document.body.classList.toggle('native-fullscreen',active);}});
+$('fullscreen-toggle').onclick=()=>fullscreen.toggle();
 let track={title:'Maru Flow',duration:150,bpm:112},localSongUrl=null,songLoading=false;
 let segmentIndex=0;
 const profile=()=>ROUTINE_PROFILES[state.profile];
@@ -47,11 +55,13 @@ function saveSettings(){
 }
 for(const id of settingIds) $(id).addEventListener('input',saveSettings);
 saveSettings();
-$('settings-open').onclick=()=>$('settings-dialog').showModal();$('help-open').onclick=()=>$('help-dialog').showModal();
+$('settings-open').onclick=()=>{if(active())pauseGame();$('settings-dialog').showModal();};$('help-open').onclick=()=>{if(active())pauseGame();$('help-dialog').showModal();};
 
 function resetTracking(){state.poses=Array(state.players).fill(null);state.matches=[null,null];state.gestures.forEach(g=>g.reset());lastStretchTime=null;}
 function updateControls(){
   const locked=active();
+  document.body.classList.toggle('in-session',locked);
+  document.body.dataset.mode=state.mode;
   document.querySelectorAll('[data-mode]').forEach(b=>b.disabled=locked||songLoading||starting);
   $('stretch-profile').disabled=locked||starting||songLoading;
   $('players').disabled=locked||starting||(state.mode==='stretch'&&profile().requiresTwo);$('song-select').disabled=locked||songLoading||state.mode==='stretch';$('song-bpm').disabled=locked;$('song-reselect').disabled=locked||songLoading;
@@ -68,7 +78,7 @@ function updateControls(){
 function selectMode(mode){
   if(active()||starting||songLoading)return;
   state.mode=mode;state.scores=[createScore(),createScore()];state.matches=[null,null];state.stretch=[{sum:0,samples:0,hold:0},{sum:0,samples:0,hold:0}];
-  audio.pause();segmentIndex=0;audio.src=selectedAudio();audio.currentTime=0;state.flash=[null,null];stopVoice();lastVoiceKey='';updateSong();
+  audio.pause();segmentIndex=0;audio.src=selectedAudio();audio.currentTime=0;state.flash=[null,null];stopVoice();rhythmAudio.stop();lastVoiceKey='';updateSong();
   document.querySelectorAll('[data-mode]').forEach(b=>{b.classList.toggle('active',b.dataset.mode===mode);b.setAttribute('aria-pressed',String(b.dataset.mode===mode));});
   const stretch=mode==='stretch',floor=stretch&&state.profile==='floor',couple=stretch&&state.profile==='couple';
   $('stretch-options').hidden=!stretch;
@@ -78,10 +88,10 @@ function selectMode(mode){
   $('mode-label').textContent=stretch?'전신 스트레칭 세트':'손동작 리듬';
   $('headline').innerHTML=stretch?'한 세트, <em>온몸을</em> 가볍게.':'손끝의 움직임이 <em>리듬</em>이 되는 순간.';
   $('intro').textContent=stretch?`${profile().name} · 목부터 발목까지 · 3곡 × 75초, 총 3분 45초`:'의자에 앉아 손만 위·아래·옆으로 · 선택한 한 곡을 즐겨요.';
-  $('stage-title').textContent=stretch?'마루의 움직임 가이드':'리듬 스테이지';
-  $('stage-subtitle').textContent=stretch?'위쪽 동작을 따라 하고 아래에서 나의 움직임을 확인해요':'박자에 맞춰 화살표 방향으로 손을 뻗어요';
+  $('stage-title').textContent=stretch?'마루의 움직임 가이드':'마루 리듬쇼';
+  $('stage-subtitle').textContent=stretch?'위쪽 동작을 따라 하고 아래에서 나의 움직임을 확인해요':'소리를 듣고 → 같은 박자에 손으로 답해요';
   $('guide-title').innerHTML=stretch?(floor?'매트에 먼저 누워서<br>편안하게 준비해 주세요.':couple?'둘이 나란히 서서<br>각자의 범위로 따라 해요.':'두 발로 편안히 서서<br>전신을 천천히 움직여요.'):'의자에 앉아 손을 가슴 앞으로.<br>손만 가볍게 뻗어 주세요.';
-  $('guide-description').textContent=stretch?(floor?'누운 동작은 시간과 음성으로 안내해요. 카메라 일치율을 매기지 않아요.':couple?'서로 당기거나 밀지 않고 같은 동작을 함께해요. 각자 벽이나 안정된 지지물을 준비해요.':'목·어깨·가슴·몸통·허벅지·종아리·발목 순서예요. 목과 하체는 시간 안내를 따라 해요.'):'한 번 뻗고 가슴 앞으로 돌아오면 다음 박자를 칠 수 있어요.';
+  $('guide-description').textContent=stretch?(floor?'누운 동작은 시간과 음성으로 안내해요. 카메라 일치율을 매기지 않아요.':couple?'서로 당기거나 밀지 않고 같은 동작을 함께해요. 각자 벽이나 안정된 지지물을 준비해요.':'목·어깨·가슴·몸통·허벅지·종아리·발목 순서예요. 목과 하체는 시간 안내를 따라 해요.'):'먼저 소리와 방향을 보고, 다음 구간에서 같은 박자에 손을 뻗어요. 가슴 앞으로 돌아오면 다음 입력 준비!';
   $('guide-foot').textContent=stretch?(floor?'누운 상태로 한 세트 · 일어날 때는 천천히':'벽이나 안정된 지지물 옆 · 머리부터 발까지 화면에'):'2인 플레이는 화면의 왼쪽 P1 · 오른쪽 P2';
   $('camera-placeholder').querySelector('p').textContent=stretch?(floor?'매트와 누운 몸 전체가 보이게 카메라를 준비해 주세요.':'서 있는 몸의 머리부터 발끝까지 화면에 보이게 준비해 주세요.'):'의자에 앉아 어깨·골반·두 손이 화면에 보이게 준비해 주세요.';
   notice(stretch?'동작을 수행했을 때 한 세트가 됩니다. 통증이나 어지럼이 있으면 멈추세요.':'준비되면 시작해요. 편안한 범위에서 손을 움직이세요.');
@@ -175,15 +185,16 @@ async function beginGame(){
   if(!state.input||active()||songLoading||starting)return;
   const ticket=++gameGeneration;state.phase='preparing';updateControls();
   state.scores=[createScore(),createScore()];state.stretch=[{sum:0,samples:0,hold:0},{sum:0,samples:0,hold:0}];state.matches=[null,null];
-  state.chart=generateChart({bpm:track.bpm,duration:track.duration,difficulty:'easy'});state.gestures.forEach(g=>g.reset());lastStretchTime=null;state.flash=[null,null];
+  state.chart=generateShowChart({bpm:track.bpm,duration:track.duration});rhythmAudio.setChart(state.chart);state.gestures.forEach(g=>g.reset());lastStretchTime=null;state.flash=[null,null];
   segmentIndex=0;audio.src=selectedAudio();audio.currentTime=0;updateSong();
-  // Unlock playback inside the click gesture; the countdown runs while audio is paused.
-  try{await audio.play();if(ticket!==gameGeneration||state.phase!=='preparing')return;audio.pause();audio.currentTime=0;}
-  catch(error){if(ticket===gameGeneration){state.phase='idle';updateControls();notice(error.name==='NotAllowedError'?'소리 재생을 허용하려면 플레이 시작 버튼을 직접 눌러 주세요.':'음악 파일을 열지 못했어요. audio/maru-flow.ogg 파일을 확인하고 다시 시작해 주세요.');}return;}
-  state.phase='countdown';state.countdownAt=performance.now();lastVoiceKey='';speak('ready');$('countdown').hidden=false;updateControls();notice('3초 뒤 시작합니다. 편안하게 준비해 주세요.');
+  // Invoke both privileged APIs synchronously inside the trusted Play click.
+  const playRequest=audio.play();rhythmAudio.unlock();const screenRequest=fullscreen.request();
+  try{await playRequest;if(ticket!==gameGeneration||state.phase!=='preparing')return;audio.pause();audio.currentTime=0;await screenRequest;if(ticket!==gameGeneration||state.phase!=='preparing')return;}
+  catch(error){if(ticket===gameGeneration){fullscreen.exit();rhythmAudio.stop();state.phase='idle';updateControls();notice(error.name==='NotAllowedError'?'소리 재생을 허용하려면 플레이 시작 버튼을 직접 눌러 주세요.':'음악 파일을 열지 못했어요. audio/maru-flow.ogg 파일을 확인하고 다시 시작해 주세요.');}return;}
+  state.phase='countdown';state.countdownAt=performance.now();lastVoiceKey='';speak(state.mode==='rhythm'?'start':'ready');$('countdown').hidden=false;updateControls();notice('3초 뒤 시작합니다. 편안하게 준비해 주세요.');
 }
 function pauseGame(){
-  stopVoice();
+  fullscreen.cancelPending();rhythmAudio.stop();stopVoice();
   if(state.phase==='playing'){audio.pause();state.phase='paused';speak('pause');notice('잠시 쉬어 가세요. 계속하기를 누르면 이어집니다.');}
   else if(state.phase==='transition'){gameGeneration++;audio.pause();state.phase='paused';notice('곡 사이에서 잠시 멈췄어요. 계속하기로 이어갑니다.');}
   else if(['countdown','preparing','starting','resuming'].includes(state.phase)){gameGeneration++;audio.pause();state.phase='idle';$('countdown').hidden=true;}
@@ -192,22 +203,25 @@ function pauseGame(){
 async function resumeGame(){
   if(state.phase!=='paused')return;
   if(state.input==='camera'&&!stream){notice('카메라를 먼저 다시 켜 주세요.');return;}
-  const ticket=++gameGeneration;state.phase='resuming';stopVoice();updateControls();
-  try{await audio.play();if(ticket!==gameGeneration||state.phase!=='resuming')return;state.phase='playing';lastStretchTime=null;state.gestures.forEach(g=>g.reset());notice('다시 시작해요. 내 속도에 맞춰 움직이세요.');}
-  catch{if(ticket===gameGeneration){state.phase='paused';notice('음악 재생을 다시 허용해 주세요. 계속하기 버튼을 한 번 더 누르세요.');}}
+  const ticket=++gameGeneration;state.phase='resuming';stopVoice();rhythmAudio.unlock();rhythmAudio.stop();updateControls();
+  const playRequest=audio.play();const screenRequest=fullscreen.request();
+  try{await playRequest;await screenRequest;if(ticket!==gameGeneration||state.phase!=='resuming')return;state.phase='playing';lastStretchTime=null;state.gestures.forEach(g=>g.reset());notice('다시 시작해요. 내 속도에 맞춰 움직이세요.');}
+  catch{if(ticket===gameGeneration){fullscreen.exit();rhythmAudio.stop();state.phase='paused';notice('음악 재생을 다시 허용해 주세요. 계속하기 버튼을 한 번 더 누르세요.');}}
   updateControls();
 }
 $('play').onclick=beginGame;$('pause').onclick=()=>state.phase==='paused'?resumeGame():pauseGame();
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseGame();});
-window.addEventListener('pagehide',()=>{stream?.getTracks().forEach(t=>t.stop());audio.pause();stopVoice();});
+window.addEventListener('pagehide',()=>{stream?.getTracks().forEach(t=>t.stop());audio.pause();rhythmAudio.stop();stopVoice();});
 audio.addEventListener('ended',()=>{if(state.phase==='playing'&&audio.ended){if(state.mode==='stretch'&&segmentIndex<2)advanceSegment();else finishGame();}});
 audio.addEventListener('waiting',()=>{if(state.phase==='playing')notice('음악을 읽는 중입니다. 파일 읽기가 끝나면 이어집니다.');});
+audio.addEventListener('playing',()=>{if(state.phase==='playing')notice(state.mode==='rhythm'?'소리와 방향을 듣고 같은 박자에 손으로 답해요.':'마루의 동작을 편안한 범위에서 따라 해요.');});
 audio.addEventListener('error',()=>{if(active())pauseGame();notice('음악 파일을 읽을 수 없어요. 설치 폴더의 음악 파일을 확인해 주세요.');});
 
 function hit(player,lane,now=performance.now()){
   if(state.phase!=='playing'||state.mode!=='rhythm'||player>=state.players)return;
   const result=judgeHit(state.chart,state.scores[player],lane,audio.currentTime-config().offset);
   state.flash[player]={lane,until:now+230,hit:!!result};
+  if(result)rhythmAudio.tone(lane,'hit',0,musicVolume());
 }
 document.addEventListener('keydown',event=>{
   if(['INPUT','SELECT','TEXTAREA'].includes(event.target.tagName)||document.querySelector('dialog[open]'))return;
@@ -227,8 +241,8 @@ async function advanceSegment(){
 }
 function finishGame(){
   if(state.phase==='results')return;
-  audio.pause();state.phase='results';speak('finish');$('countdown').hidden=true;
-  state.lastResult={version:'0.2.0',timestamp:new Date().toISOString(),mode:state.mode,profile:state.mode==='stretch'?state.profile:null,input:state.input,duration:Math.min(sessionTime(),sessionDuration()),players:state.players,track:state.mode==='stretch'?profile().name:track.title,elimination:false,results:Array.from({length:state.players},(_,i)=>state.mode==='rhythm'?{matched:state.scores[i].hits.size,total:state.chart.length}: {similarity:state.stretch[i].samples?Math.round(state.stretch[i].sum/state.stretch[i].samples):null,matchedSeconds:Math.round(state.stretch[i].hold),observedFrames:state.stretch[i].samples})};
+  audio.pause();rhythmAudio.stop();state.phase='results';fullscreen.exit();speak('finish');$('countdown').hidden=true;
+  state.lastResult={version:'0.3.0',timestamp:new Date().toISOString(),mode:state.mode,profile:state.mode==='stretch'?state.profile:null,input:state.input,duration:Math.min(sessionTime(),sessionDuration()),players:state.players,track:state.mode==='stretch'?profile().name:track.title,elimination:false,results:Array.from({length:state.players},(_,i)=>state.mode==='rhythm'?{matched:state.scores[i].hits.size,total:state.chart.length}: {similarity:state.stretch[i].samples?Math.round(state.stretch[i].sum/state.stretch[i].samples):null,matchedSeconds:Math.round(state.stretch[i].hold),observedFrames:state.stretch[i].samples})};
   $('result-dialog').querySelector('h2').textContent=state.mode==='stretch'?'한 세트의 안내를 마쳤어요.':'한 곡을 마쳤어요.';
   $('result-subtitle').textContent=state.mode==='stretch'?`${profile().name} · 3분 45초 안내 완료. 동작 수행 여부나 운동 효과를 자동 확인한 것은 아니에요.`:`${track.title} · ${clock(track.duration)} · 편안하게 마무리하세요.`;
   $('result-cards').replaceChildren();
@@ -242,7 +256,7 @@ function finishGame(){
   });
   $('result-dialog').showModal();updateControls();notice('완주했어요! 기록을 저장하거나 다시 즐겨 보세요.');
 }
-function resetSession(){audio.pause();segmentIndex=0;audio.src=selectedAudio();audio.currentTime=0;stopVoice();lastVoiceKey='';state.phase='idle';state.scores=[createScore(),createScore()];state.stretch=[{sum:0,samples:0,hold:0},{sum:0,samples:0,hold:0}];state.flash=[null,null];resetTracking();updateSong();updateControls();}
+function resetSession(){fullscreen.exit();rhythmAudio.stop();audio.pause();segmentIndex=0;audio.src=selectedAudio();audio.currentTime=0;stopVoice();lastVoiceKey='';state.phase='idle';state.scores=[createScore(),createScore()];state.stretch=[{sum:0,samples:0,hold:0},{sum:0,samples:0,hold:0}];state.flash=[null,null];resetTracking();updateSong();updateControls();}
 $('retry').onclick=()=>{$('result-dialog').close();resetSession();};
 $('stop-session').onclick=()=>{gameGeneration++;resetSession();notice('진행을 마쳤어요. 다른 모드나 노래를 고를 수 있습니다.');};
 $('result-dialog').addEventListener('cancel',resetSession);
@@ -292,84 +306,36 @@ function resize(canvas,context){
 }
 function rounded(context,x,y,w,h,r,fill,stroke){context.beginPath();context.roundRect(x,y,w,h,r);if(fill){context.fillStyle=fill;context.fill();}if(stroke){context.strokeStyle=stroke;context.stroke();}}
 function text(context,str,x,y,size=12,color='#9baac3',align='left'){context.font=`${size}px "Segoe UI", "Malgun Gothic", sans-serif`;context.textAlign=align;context.fillStyle=color;context.fillText(str,x,y);}
-function wrappedText(context,str,x,y,width,size,color,maxLines=2){
-  context.font=`${size}px "Segoe UI", "Malgun Gothic", sans-serif`;let line='',rows=[];
-  for(const ch of str){if(context.measureText(line+ch).width>width&&line){rows.push(line);line=ch;}else line+=ch;}if(line)rows.push(line);
-  rows.slice(0,maxLines).forEach((row,i)=>text(context,row,x,y+i*size*1.4,size,color));
-}
 function drawRobot(context,pose,x,y,w,h,color=COLORS[0]){
   const pos=i=>({x:x+pose[i].x*w,y:y+pose[i].y*h});
   const unit=Math.min(w,h);
   context.save();context.lineCap='round';context.lineJoin='round';
   for(const [a,b] of CONNECT){const pa=pos(a),pb=pos(b);context.lineWidth=unit*.045;context.strokeStyle='#263b4b';context.beginPath();context.moveTo(pa.x,pa.y);context.lineTo(pb.x,pb.y);context.stroke();context.lineWidth=unit*.018;context.strokeStyle=color;context.stroke();}
   context.beginPath();[11,12,24,23].forEach((id,i)=>{const p=pos(id);i?context.lineTo(p.x,p.y):context.moveTo(p.x,p.y);});context.closePath();context.fillStyle=color;context.fill();context.strokeStyle=color;context.lineWidth=unit*.05;context.stroke();
-  const head=pos(0),hw=unit*.22,l=pos(11),r=pos(12),hipL=pos(23),hipR=pos(24);
+  const head=pos(0),hw=unit*.29,l=pos(11),r=pos(12),hipL=pos(23),hipR=pos(24);
   const rotation=Math.atan2((l.y+r.y-hipL.y-hipR.y)/2,(l.x+r.x-hipL.x-hipR.x)/2)+Math.PI/2;
   context.save();context.translate(head.x,head.y);context.rotate(rotation);
-  rounded(context,-hw*.5,-hw*.4,hw,hw*.8,hw*.35,color);
+  rounded(context,-hw*.5,-hw*.4,hw,hw*.8,hw*.35,color,'#37626a');
+  context.fillStyle='#d9f8df90';context.beginPath();context.ellipse(-hw*.23,-hw*.22,hw*.12,hw*.045,-.5,0,Math.PI*2);context.fill();
   rounded(context,-hw*.38,-hw*.26,hw*.76,hw*.55,hw*.2,'#f7f1d9');
   for(const side of [-1,1]){context.fillStyle='#293642';context.beginPath();context.ellipse(side*hw*.18,0,hw*.045,hw*.072,0,0,Math.PI*2);context.fill();}
+  context.strokeStyle='#567269';context.lineWidth=hw*.025;context.beginPath();context.arc(0,hw*.02,hw*.10,.2,Math.PI-.2);context.stroke();
+  for(const side of [-1,1]){context.fillStyle='#ecb2a28a';context.beginPath();context.ellipse(side*hw*.27,hw*.08,hw*.07,hw*.035,0,0,Math.PI*2);context.fill();}
   context.strokeStyle=color;context.lineWidth=2;context.beginPath();context.moveTo(0,-hw*.4);context.lineTo(0,-hw*.59);context.stroke();
   context.fillStyle=color;context.beginPath();context.ellipse(hw*.05,-hw*.64,hw*.10,hw*.05,-.5,0,Math.PI*2);context.fill();context.restore();
   for(const id of [15,16]){const p=pos(id);context.beginPath();context.arc(p.x,p.y,unit*.034,0,Math.PI*2);context.fillStyle='#f1ad9c';context.fill();}
   for(const id of [27,28]){const p=pos(id);context.save();context.translate(p.x,p.y);context.rotate(pose[id].footAngle||0);rounded(context,-unit*.043,-unit*.02,unit*.10,unit*.042,unit*.015,'#f4edda');context.restore();}
   context.restore();
 }
-function drawRhythm(w,h,now){
-  const count=state.players,section=w/count,time=audio.currentTime-config().offset;
-  for(let player=0;player<count;player++){
-    const left=section*player+section*.08, width=section*.84,laneW=width/4,hitY=h-43,color=COLORS[player];
-    for(let lane=0;lane<4;lane++){
-      const x=left+laneW*lane;
-      ctx.fillStyle=lane%2?'#192439':'#172133';ctx.fillRect(x+2,0,laneW-4,h);
-      ctx.strokeStyle='#304057';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x+laneW*.5,0);ctx.lineTo(x+laneW*.5,h);ctx.stroke();
-      const flash=state.flash[player],lit=flash?.lane===DIRECTIONS[lane]&&flash.until>now;
-      rounded(ctx,x+laneW*.13,hitY-18,laneW*.74,36,9,lit?color:'#263c48',lit?null:color);
-      text(ctx,ARROWS[DIRECTIONS[lane]],x+laneW*.5,hitY+8,25,lit?'#183a31':color,'center');
-      if(state.input==='keyboard')text(ctx,(player===0?['A','W','S','D']:['←','↑','↓','→'])[lane],x+laneW*.5,h-9,9,'#97a8bf','center');
-    }
-    ctx.strokeStyle=color;ctx.globalAlpha=.25;ctx.beginPath();ctx.moveTo(left,hitY);ctx.lineTo(left+width,hitY);ctx.stroke();ctx.globalAlpha=1;
-    for(const note of state.chart){
-      if(state.scores[player].hits.has(note.id)||state.scores[player].expired.has(note.id))continue;
-      const delta=note.time-time;if(delta>2.6||delta<-.30)continue;
-      const lane=DIRECTIONS.indexOf(note.lane),x=left+laneW*(lane+.5),y=hitY-delta*(hitY/2.6);
-      rounded(ctx,x-laneW*.30,y-13,laneW*.60,26,7,color);text(ctx,ARROWS[note.lane],x,y+7,22,'#19323b','center');
-    }
-    text(ctx,`P${player+1}`,left+10,22,10,color);
-    if(state.phase==='playing'&&time<4.1)text(ctx,'손을 가슴 앞에 · 준비',left+width/2,h*.45,14,'#dee6f3','center');
-    const flash=state.flash[player];if(flash?.hit&&flash.until>now)text(ctx,'박자가 맞았어요',left+width/2,h*.43,15,color,'center');
-  }
-}
-function drawStretch(w,h){
-  const item=currentExercise(),steps=profile().steps,pose=routinePose(item,state.profile);
-  const floor=state.profile==='floor',couple=state.profile==='couple',area=w*.48,tx=w*.52;
-  if(floor){
-    const fw=Math.min(area*.94,320),fh=Math.min(h*.70,fw*.75),fx=(area-fw)/2,fy=h*.18;
-    rounded(ctx,fx,fy+fh*.03,fw,fh*.97,18,'#263d42','#3e6865');
-    drawRobot(ctx,pose,fx,fy,fw,fh);
-    text(ctx,'누운 자세 · 위에서 본 예시',area/2,h*.94,w<550?8:10,'#87aba4','center');
-  }else{
-    const count=couple?2:1,fw=Math.min(couple?140:190,area/(count+.25),h*.85),fy=(h-fw)/2;
-    for(let i=0;i<count;i++){
-      const cx=area*(i+1)/(count+1);
-      ctx.strokeStyle='#38534f';ctx.beginPath();ctx.ellipse(cx,fy+fw*.99,fw*.45,6,0,0,Math.PI*2);ctx.stroke();
-      drawRobot(ctx,pose,cx-fw/2,fy,fw,fw,COLORS[i]);
-      if(couple)text(ctx,`P${i+1}`,cx,fy-8,10,COLORS[i],'center');
-    }
-  }
-  text(ctx,`${item.region} · ${item.match?'카메라 일치 확인':'시간 안내'}`,tx,h*.17,10,COLORS[0]);
-  const title=item.resting?'힘을 풀고 잠시 쉬어요':item.title;
-  wrappedText(ctx,title,tx,h*.30,w-tx-12,w<550?12:18,'#e7eff6');
-  wrappedText(ctx,item.cue,tx,h*.48,w-tx-12,w<550?9:12,'#a3b3c8',3);
-  text(ctx,`동작 ${item.index+1} / ${steps.length} · ${Math.ceil(item.remaining)}초`,tx,h*.74,10,'#849cb2');
-  const next=steps[item.index+1];wrappedText(ctx,next?`다음: ${next.title}`:'편안한 호흡으로 마무리해요',tx,h*.84,w-tx-10,w<550?8:9,'#74948f');
-  const beat=Math.floor(audio.currentTime/(60/112))%4;for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(tx+i*15,h*.96,3,0,Math.PI*2);ctx.fillStyle=i===beat?COLORS[0]:'#364757';ctx.fill();}
-}
 function drawStage(now){
   const {w,h}=resize(stage,ctx);ctx.clearRect(0,0,w,h);
-  if(state.phase==='idle')return;
-  if(state.mode==='rhythm')drawRhythm(w,h,now);else drawStretch(w,h);
-  if(state.phase==='paused'){ctx.fillStyle='#101828c9';ctx.fillRect(0,0,w,h);text(ctx,'잠시 쉬어 가요',w/2,h/2,23,COLORS[0],'center');}
+  const common={drawRobot,reduced:reducedMotion.matches,time:state.phase==='idle'?0:sessionTime()};
+  if(state.phase==='idle'){
+    drawWelcome(ctx,w,h,{...common,stretch:state.mode==='stretch',profile:state.profile,pose:routinePose(currentExercise(),state.profile)});return;
+  }
+  if(state.mode==='rhythm')drawRhythmShow(ctx,w,h,{...common,state,time:audio.currentTime-config().offset,bpm:track.bpm,duration:track.duration,now});
+  else drawStretchWorld(ctx,w,h,{...common,item:currentExercise(),steps:profile().steps,profile:state.profile,pose:routinePose(currentExercise(),state.profile)});
+  if(state.phase==='paused'){ctx.fillStyle='#182c45a6';ctx.fillRect(0,0,w,h);text(ctx,'잠시 쉬어 가요',w/2,h/2,w<450?20:34,'#fff3d0','center');text(ctx,'왼쪽 계속하기로 다시 시작해요',w/2,h/2+32,w<450?10:13,'#d1e9dc','center');}
 }
 function drawCamera(){
   const {w,h}=resize(overlay,camCtx);camCtx.clearRect(0,0,w,h);
@@ -402,13 +368,14 @@ function frame(now){
   if(frameGap>1000&&state.phase==='playing')pauseGame();
   if(state.phase==='countdown'){
     const left=3-Math.floor((now-state.countdownAt)/1000);$('countdown').textContent=Math.max(left,1);
-    if(left<=0){const ticket=gameGeneration;state.phase='starting';updateControls();$('countdown').hidden=true;audio.play().then(()=>{if(ticket!==gameGeneration||state.phase!=='starting')return;if(document.hidden){pauseGame();return;}state.phase='playing';updateControls();notice(state.mode==='rhythm'?'아래 판정선에 노트가 닿을 때 손을 뻗어요. 놓쳐도 끝까지 즐길 수 있어요.':'위쪽 마루의 움직임을 편안하게 따라 하세요. 중간중간 쉬어 갑니다.');}).catch(()=>{if(ticket===gameGeneration){state.phase='idle';updateControls();notice('재생이 멈췄어요. 플레이 시작을 다시 눌러 주세요.');}});}
+    if(left<=0){const ticket=gameGeneration;state.phase='starting';updateControls();$('countdown').hidden=true;audio.play().then(()=>{if(ticket!==gameGeneration||state.phase!=='starting')return;if(document.hidden){pauseGame();return;}state.phase='playing';updateControls();notice(state.mode==='rhythm'?'먼저 소리와 방향을 듣고, 이제 손으로 답해요 구간에 같은 박자로 움직여요.':'위쪽 마루의 움직임을 편안하게 따라 하세요. 중간중간 쉬어 갑니다.');}).catch(()=>{if(ticket===gameGeneration){state.phase='idle';updateControls();notice('재생이 멈췄어요. 플레이 시작을 다시 눌러 주세요.');}});}
   }
   if(!document.hidden)infer(now);
   if(state.phase==='playing'){
     if(state.mode==='stretch')audio.volume=musicVolume()*(coach.paused?1:.35)*Math.min(clamp(audio.currentTime/.4),clamp((75-audio.currentTime)/.4));
     if(state.mode==='stretch'){const item=currentExercise(),key=`${state.profile}:${item.index}`;if(key!==lastVoiceKey){lastVoiceKey=key;speak(item.voice);}}
-    else if(lastVoiceKey!=='rhythm-start'){lastVoiceKey='rhythm-start';speak('start');}
+    else if(lastVoiceKey!=='rhythm-start'){lastVoiceKey='rhythm-start';}
+    if(state.mode==='rhythm')rhythmAudio.tick(audio.currentTime-config().offset,musicVolume());
     if(state.mode==='rhythm')for(let i=0;i<state.players;i++)expireNotes(state.chart,state.scores[i],audio.currentTime-config().offset);
     if(state.mode==='stretch'&&audio.currentTime>=75){if(segmentIndex<2)advanceSegment();else finishGame();}
     else if(state.mode==='rhythm'&&audio.currentTime>=track.duration)finishGame();

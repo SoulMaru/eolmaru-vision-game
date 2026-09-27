@@ -1,6 +1,6 @@
 {
   "name": "eolmaru-vision-game",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "얼마루비전게임 — free local two-player vision rhythm and gentle movement",
   "type": "module",
