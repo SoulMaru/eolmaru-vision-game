@@ -4,8 +4,8 @@ import {createHands,assignSaberPlayers,calibrationFromPose,poseHand,calibrationM
 import {drawSaber,stageToGrid} from './saber-render.mjs';
 
 export class SaberGame {
-  constructor({stage,audio,phase,players,input,notice,onHit,latency,range,quality}){
-    Object.assign(this,{stage,audio,phase,players,input,notice,onHit,latency,range,quality});
+  constructor({stage,audio,phase,players,input,notice,onHit,onReset,latency,range,quality}){
+    Object.assign(this,{stage,audio,phase,players,input,notice,onHit,onReset,latency,range,quality});
     this.chart=generateEasyChart();this.selected={player:0,hand:'left'};this.keys=new Set();this.sessionId=0;this.epoch=0;
     this.calibrations=[null,null];this.cameraPoses=[null,null];this.status=['손을 편안하게 준비해요','손을 편안하게 준비해요'];
     this.points=[{left:{x:1.5,y:2.7},right:{x:2.5,y:2.7}},{left:{x:1.5,y:2.7},right:{x:2.5,y:2.7}}];
@@ -24,7 +24,7 @@ export class SaberGame {
   setTrack(track){this.setChart(generateEasyChart({bpm:track.bpm,duration:track.duration,songId:track.songId||'maru-flow'}));}
   importChart(text,track){const chart=validateChart(text,{duration:track.duration,songId:track.songId||'maru-flow'});this.setChart(chart);return chart;}
   start(){this.sessionId++;this.configure();this.lastTime=0;}
-  resetInput(){this.epoch++;this.keys.clear();this.hands?.forEach(h=>HANDS.forEach(hand=>h[hand].reset()));this.lastFrame=null;this.effects=[];}
+  resetInput(){this.epoch++;this.keys.clear();this.hands?.forEach(h=>HANDS.forEach(hand=>h[hand].reset()));this.lastFrame=null;this.effects=[];this.onReset?.();}
   forgetCamera(){this.calibrations=[null,null];this.cameraPoses=[null,null];this.calibrationTask=null;this.resetInput();}
   select(player,hand){this.selected={player:Math.min(player,this.players()-1),hand:HANDS.includes(hand)?hand:'left'};this.resetInput();}
   key(event,down){
@@ -43,7 +43,7 @@ export class SaberGame {
     const segment=tracker.push(sample);
     if(this.phase()==='playing'){
       const event=this.sessions[player].observe(segment,this.audio.currentTime);
-      if(event){this.effects.push({...event,time:this.audio.currentTime});this.effects=this.effects.slice(-24);if(event.kind==='hit')this.onHit(event.direction);}
+      if(event){this.effects.push({...event,time:this.audio.currentTime});this.effects=this.effects.slice(-24);if(event.kind==='hit')this.onHit?.(event);}
     }
   }
   camera(poses,aspect,now,capturedAudioTime){
@@ -101,7 +101,7 @@ export class SaberGame {
       this.status=['마우스 또는 방향키 · Q 왼손 / E 오른손','1·2로 시험할 사람 선택'];
     }
     if(this.phase()==='playing')for(let p=0;p<this.players();p++)this.sessions[p].advance(time);
-    this.effects=this.effects.filter(e=>time-e.time<.65&&time>=e.time);
+    this.effects=this.effects.filter(e=>time-e.time<.85&&time>=e.time);
   }
   draw(ctx,w,h,{reduced=false}={}){
     const idle=this.phase()==='idle',time=idle?performance.now()/1000:this.audio.currentTime;

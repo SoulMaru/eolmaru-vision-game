@@ -8,7 +8,7 @@
 | H02 | 카메라 가까이 앉거나 발/손이 프레임 밖 | 보이는 신뢰도 있는 상체만 비교; 목/하체 안내 유지 | 손 리듬 의자/서기 전신/누운 매트 카메라 구도. `MediaPipe pose wrist visibility standing supine partial body` |
 | H03 | 박자에 맞췄는데 체감상 늦음 | 오디오 시계 기준 세이버 입력 ±250ms 보정, 채보offset별도 | 실제 카메라 지연을 관측한 뒤 기본값 조정. `rhythm game audio input latency calibration` |
 | H04 | 인식마다 화면이 잠깐 끊김 | 기본12Hz, 추론85ms 초과시 최대8Hz, 640px, GPU→CPU fallback | 사람2명 실측 후 필요시 Worker 전환. `MediaPipe Tasks Vision OffscreenCanvas worker wasm module` |
-| H05 | 한국어 안내/음악의 발음·음량 | F 해미 음성·별도 볼륨·음악 ducking | 사람 청취. `Windows SAPI Korean Heami pronunciation` |
+| H05 | 한국어 안내/칭찬의 감정·발음·음색 일관성과 음악 균형 | F Qwen VoiceDesign sunny/girl_story bright, 안내/칭찬/타격음 별도 볼륨. 설계 음성은 문장 간 음색이 달라질 수 있음 | 사람 청취. `Qwen3 TTS VoiceDesign Korean expressive short utterance` |
 | H06 | 사용자 곡의 비트가 채보와 안 맞음 | 사용자 BPM 연습채보, 편집기에서offset·노트시각수정/JSON입력가능 | 인트로·변박 자동분석은 미구현. 기본곡 또는수동편집사용. `audio beat detection onset tempo offset local` |
 | H07 | 발끝/목의 움직임을 정확하게 평가하고 싶음 | 해당 동작 시간 안내, 수행/효과 점수 없음 | 다중시점·개인 보정·실제 영상 검증 없이는 정밀 기능이라고 주장하지 않음 |
 
@@ -67,3 +67,11 @@
 | SB07 | 아직 실제 웹캠의 세이버 궤적/도달 범위/2인 체감 지연을 측정한 결과 없음 | 8/12/20Hz 합성과 실제 1인/2인·가림·손 교차를 분리 기록 | 단계 4/6/9 대기. `low fps wrist interpolation false positive calibration` |
 
 - SR07: 0.4 브랜드 문구 변경으로 실행기의 기존서버 식별 문자열이 사라짐 → 고정 application-name 메타데이터 EOLMARU VISION을 추가해 표시이름과분리. 서버가이미실행중인상태에서 tools/launch.ps1 실제실행으로 기존서버재사용과브라우저열기를확인했다. `PowerShell local server identity launch existing instance`.
+
+## 0.5 손·성공 반응·음성
+
+- RF01: 초기 칭찬 파일 중 일부만 로딩된 순간 시작하면 나머지 등급 무음 → preload Promise 공유 및 전체 로딩 완료 대기, 독립 회귀 통과.
+- RF02: 최대 음량으로 8개 동시 타격음 합성 시 peak >1 → 공유 master의 동시 버스트 수에 따른 음량 정규화, 5등급×1/8중첩 PCM 렌더에서 모두 peak <1. 음악·칭찬까지 포함한 전체 믹스나 사람 청취를 뜻하지 않는다.
+- VG01: Qwen 짧은 원고의 생성이 비정상적으로 늘어남 → 해당 소유 작업을 중단하고 프로젝트 어댑터에 문장 길이별 생성 토큰 상한·길이 검사·최대3시드 재시도 추가. F 원본 파일은 변경하지 않았다. `Qwen3 TTS short text runaway max_new_tokens`
+- 검의 긴 몸체/손 그림/잔상은 장식이며 실제 충돌은 관측 손목의 밝은 검 끝이다. 손가락 쥠 인식은 추가하지 않았다.
+- 이번 음성은 특정 실존 인물의 복제가 없는 가상 캐릭터 합성이다. 모든 안내의 실제 감정/발음 만족도와 카메라 1~2인 체감은 수동 검증 대기.

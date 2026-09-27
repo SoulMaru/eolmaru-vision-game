@@ -1,0 +1,73 @@
+{
+  "version": 2,
+  "language": "ko-KR",
+  "title": "마루의 명랑한 어린이풍 칭찬",
+  "generatedAt": "2026-09-27T08:42:35.167Z",
+  "engine": {
+    "name": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+    "source": "F-drive voice studio",
+    "studioScript": "F:/0.SoulmaruAI/1.aiimage/webtoon-translator/local-api/backend/python/voice/tts_server.py",
+    "studioScriptSha256": "b265d0cbcb23ca5055f9147dfc6fc9e01c81bd69bd60618fd839c55e4419cd8e",
+    "voice": "girl_story",
+    "mood": "bright",
+    "direction": "",
+    "rate": 2,
+    "seed": 727,
+    "networkRequired": false,
+    "impersonation": false
+  },
+  "generationAdapter": {
+    "file": "tools/voice-local-server.py",
+    "sha256": "04cec8345c34904618639236ae0d111fd56c4ed4091f23f358b2da2d46b86a6c",
+    "policy": "Per-utterance token cap; initial seven verified short clips reused from the direct studio. CPU, six threads, offline."
+  },
+  "rights": "Original game scripts synthesized locally with Qwen3-TTS VoiceDesign (Apache-2.0 model). Fictional voices; no recorded person or cloned voice. Model is not redistributed.",
+  "verification": "Full decode, duration, bytes and SHA-256 checked. Emotion, pronunciation and game mix require human listening. VoiceDesign does not guarantee identical speaker identity between utterances.",
+  "cues": {
+    "good": {
+      "text": "굳!",
+      "file": "/audio/praise/good.ogg",
+      "durationSeconds": 0.212542,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 4666,
+      "sha256": "6083840f9106ecbfc4438d5d1e262de698989722e23403c14fcdece5f08f18d8"
+    },
+    "great": {
+      "text": "그레이트!",
+      "file": "/audio/praise/great.ogg",
+      "durationSeconds": 0.908917,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 9129,
+      "sha256": "4967da049cdae5eb0898614546b0858665aedb017f5954ffa4a39a42a00f6945"
+    },
+    "perfect": {
+      "text": "퍼팩트!",
+      "file": "/audio/praise/perfect.ogg",
+      "durationSeconds": 0.657583,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 7557,
+      "sha256": "300dda3750443df9eee7ca364409bcbc02acd405b39094c14c128dc56cd1c138"
+    },
+    "excellent": {
+      "text": "엑셀런트!",
+      "file": "/audio/praise/excellent.ogg",
+      "durationSeconds": 0.829708,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 8651,
+      "sha256": "2393bceaa89414044af02a152e233685df167dadca681c9f1a3146824351a620"
+    },
+    "yummy": {
+      "text": "야미!",
+      "file": "/audio/praise/yummy.ogg",
+      "durationSeconds": 0.515833,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 6507,
+      "sha256": "0cb3f212dc5f829d458f8dc5e39ab4b10c414ec57b948367670f83aaa7e60799"
+    }
+  }
+}

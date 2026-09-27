@@ -1,6 +1,17 @@
 // Pure, player-local decisions. No DOM, clock reads, score or audio side effects.
 export const POLICY=Object.freeze({window:.25,grace:.45,directionDegrees:50,coverage:.8,halfSize:.36,maxGap:.2,minDistance:.07,minSpeed:.65,maxSpeed:35});
 const vectors={up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}};
+export const HIT_GRADES=Object.freeze([
+  ['good','굳'],['great','그레이트'],['perfect','퍼팩트'],['excellent','엑셀런트'],['yummy','야미'],
+].map(([key,label],tier)=>Object.freeze({key,label,tier})));
+export function timingGrade(hitTime,noteTime,window=POLICY.window){
+  if(![hitTime,noteTime,window].every(Number.isFinite)||window<=0)throw new RangeError('Finite times and a positive timing window are required.');
+  const timingErrorMs=(hitTime-noteTime)*1000;
+  const accuracy=Math.max(0,Math.min(100,100*(1-Math.abs(hitTime-noteTime)/window)));
+  // Absorb binary representation noise at exact boundaries, not display rounding.
+  const tier=Math.min(4,Math.floor((accuracy+1e-9)/20));
+  return {accuracy,timingErrorMs,grade:HIT_GRADES[tier]};
+}
 
 export function segmentRect(a,b,rect){
   let enter=0,exit=1;
@@ -26,6 +37,7 @@ export class SaberSession {
   outcome(note,kind,time,hand=note.hand){
     if(this.states.has(note.id))return null;
     const event={id:note.id,kind,time,player:this.player,hand,x:note.lineIndex+.5,y:note.lineLayer+.5,direction:note.cutDirection};
+    if(kind==='hit')Object.assign(event,timingGrade(time,note.hitTime,this.policy.window));
     this.states.set(note.id,event);this.counts[kind]++;return event;
   }
   observe(segment,arrivalTime){

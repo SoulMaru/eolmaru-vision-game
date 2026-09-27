@@ -82,6 +82,9 @@ const manifest = {
 let previous = null;
 try { previous = JSON.parse(readFileSync(join(out, 'manifest.json'), 'utf8')); } catch {}
 try {
+  if (previous?.engine?.name?.startsWith('Qwen3') && !process.argv.includes('--legacy-sapi')) {
+    throw new Error('Expressive VoiceDesign clips are installed. Use tools/generate-expressive-voices.ps1. Replacing them with legacy Heami requires the explicit --legacy-sapi option.');
+  }
   for (const [id, text] of Object.entries(cues)) {
     const file = join(out, `${id}.ogg`);
     const cached = previous?.cues?.[id];

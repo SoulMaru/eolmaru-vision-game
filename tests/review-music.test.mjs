@@ -32,7 +32,9 @@ function vorbisFormat(bytes){
   return {...format,frames:endGranule,duration:endGranule/format.sampleRate,pages};
 }
 // Independently captured before music work, at HEAD 8e7971c. Do not regenerate
-// these expectations from changed metadata: the test protects original assets.
+// these expectations from changed metadata: the test protects original music.
+// Voice replacement is explicitly authorized by the later feedback update;
+// its current manifest/assets are checked by profile/feedback tests instead.
 const ORIGINAL_HASHES={
   'audio/maru-flow.ogg':'a940becf5467a95501eed896ac1b860cc90c764239ed18ed2eac5c7090d79cb3',
   'audio/maru-flow.json':'f02131e0119dc53ce70e40c06e16ad9971e5419ed08dbdb091362396a8422bae',
@@ -40,10 +42,9 @@ const ORIGINAL_HASHES={
   'audio/maru-breeze.json':'1560979b5db0bd6c3c822603156ed9ccf348530e45b2e154ae4eb74def8881f7',
   'audio/maru-sunset.ogg':'2eab0411221a10f2529ded19362709e5f553a8e8da49b1094506ee8be33345d6',
   'audio/maru-sunset.json':'963830465320d2279fa6d10e3e0eeab841014b5b14d1706b5dc4dad6c95df62b',
-  'audio/voice/manifest.json':'3a78a0db9307a43c2c0e77c27760930eea85b0196b10fe27a4ca11bdc83c7e5e',
 };
 
-test('dance expansion preserves the three original songs, their metadata and voice manifest byte-for-byte',()=>{
+test('dance expansion preserves the three original songs and their metadata byte-for-byte',()=>{
   for(const [path,expected] of Object.entries(ORIGINAL_HASHES))assert.equal(hash(publicFile(path)),expected,path);
 });
 

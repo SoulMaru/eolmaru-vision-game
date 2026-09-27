@@ -16,8 +16,19 @@ const required=['public/index.html','public/audio/maru-flow.ogg','public/audio/v
 const musicFiles=[...new Set([...BUILTIN_SONGS,...SET_TRACKS].map(song=>song.src))];
 required.push(...musicFiles.flatMap(src=>[`public${src}`,`public${src.replace(/\.ogg$/,'.json')}`]),...BUILTIN_SONGS.map(song=>`public${song.chart}`));
 const missing=[];for(const file of required){try{await stat(path.join(root,file));}catch{missing.push(file);}}
-const manifest=JSON.parse(await readFile(path.join(root,'public/audio/voice/manifest.json'),'utf8'));
-const voiceErrors=[];for(const [id,cue] of Object.entries(manifest.cues)){const record=entries.find(e=>e.file===`public${cue.file}`);if(!record||record.sha256!==cue.sha256||record.bytes!==cue.bytes)voiceErrors.push(id);}
+const voiceErrors=[];
+for(const folder of ['voice','praise']){
+  const manifest=JSON.parse(await readFile(path.join(root,`public/audio/${folder}/manifest.json`),'utf8'));
+  const referenced=new Set();
+  for(const [id,cue] of Object.entries(manifest.cues)){
+    const file=`public${cue.file}`,record=entries.find(e=>e.file===file);referenced.add(file);
+    if(cue.file!==`/audio/${folder}/${id}.ogg`||!record||record.sha256!==cue.sha256||record.bytes!==cue.bytes)voiceErrors.push(`${folder}/${id}`);
+  }
+  for(const record of entries.filter(e=>e.file.startsWith(`public/audio/${folder}/`)&&e.file.endsWith('.ogg'))){
+    if(!referenced.has(record.file))voiceErrors.push(`unused: ${record.file}`);
+  }
+  if(Object.keys(manifest.cues).length!==(folder==='voice'?31:5))voiceErrors.push(`${folder}: unexpected cue count`);
+}
 const musicErrors=[];
 for(const src of musicFiles){
   try{

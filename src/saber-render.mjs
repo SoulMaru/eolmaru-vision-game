@@ -8,6 +8,26 @@ const finite = Number.isFinite;
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 const font = '"Segoe UI", "Malgun Gothic", sans-serif';
 const MAX_NOTES = 48, MAX_EFFECTS = 16, MAX_TRAIL = 20;
+export const EFFECT_SECONDS = .85;
+const TRAIL_SECONDS = .22;
+const GRADE_VISUALS = Object.freeze([
+  {key:'good',label:'굳',color:'#a9eacf'},
+  {key:'great',label:'그레이트',color:'#71e2ff'},
+  {key:'perfect',label:'퍼팩트',color:'#c4a2ff'},
+  {key:'excellent',label:'엑셀런트',color:'#ffe28e'},
+  {key:'yummy',label:'야미',color:'#ff9edb'},
+]);
+
+/** Visual budgets are pure and bounded; no score or tracking result is created here. */
+export function effectStyle(grade,{low=false,reduced=false}={}) {
+  const known=GRADE_VISUALS.findIndex(g=>g.key===grade?.key);
+  const tier=known<0?0:known;
+  return {tier,color:GRADE_VISUALS[tier].color,label:known<0?null:GRADE_VISUALS[tier].label,
+    particles:reduced?0:low?5+tier:8+tier*5,
+    confetti:reduced||low||tier<3?0:4+(tier-3)*4,
+    rings:reduced||low?1:1+Math.floor(tier/2),
+    afterimages:reduced?0:low?2:6};
+}
 
 function validLayout(w, h, players, player) {
   return finite(w) && finite(h) && w > 0 && h > 0 &&
@@ -175,6 +195,52 @@ function drawNotes(c,r,notes,time,low) {
   }
 }
 
+function bladeGeometry(x,y,cell,handName) {
+  const sx=handName==='left'?-1:1;
+  return {x,y,baseX:x+sx*cell*.20,baseY:y+cell*.65,angle:-sx*Math.atan(.20/.65),length:Math.hypot(.20,.65)*cell};
+}
+
+function saberShape(c,x,y,cell,handName,{ghost=false,low=false,selected=false}={}) {
+  const p=PALETTE[handName],g=bladeGeometry(x,y,cell,handName);
+  c.save();c.translate(x,y);c.rotate(g.angle);c.lineCap='round';
+  if(ghost) {
+    line(c,0,0,0,g.length,p.glow,Math.max(4,cell*.11));
+    line(c,0,g.length,0,g.length+cell*.25,p.edge,Math.max(5,cell*.12));
+    line(c,-cell*.12,g.length,cell*.12,g.length,p.edge,Math.max(2,cell*.045));
+    c.restore();return;
+  }
+  // Blade tip remains at the observed wrist coordinate; the rest is a stylized prop.
+  if(!low){c.shadowColor=p.glow;c.shadowBlur=19;}
+  line(c,0,g.length,0,0,p.glow,Math.max(6,cell*.12));
+  c.shadowBlur=0;
+  line(c,0,g.length,0,0,p.edge,Math.max(3,cell*.069));
+  line(c,0,g.length,0,0,'#f4ffff',Math.max(1.6,cell*.028));
+  rounded(c,-cell*.064,g.length,cell*.128,cell*.34,cell*.03,'#151d33','#758fa9',1.2);
+  for(let i=0;i<4;i++)line(c,-cell*.055,g.length+cell*(.08+i*.055),cell*.055,g.length+cell*(.08+i*.055),'#455974',Math.max(1,cell*.018));
+  path(c,[[-cell*.16,g.length-cell*.02],[-cell*.10,g.length+cell*.045],[cell*.10,g.length+cell*.045],[cell*.16,g.length-cell*.02]],p.edge,'#f1fbff',1);
+
+  // A compact original armored glove holds the hilt. It is artwork, not finger tracking.
+  const gy=g.length+cell*.16;
+  rounded(c,-cell*.17,gy-cell*.075,cell*.34,cell*.245,cell*.075,'#273f54','#92b8c8',Math.max(1,cell*.018));
+  rounded(c,-cell*.125,gy-cell*.14,cell*.25,cell*.17,cell*.05,'#b5ccd3','#e6f4f2',Math.max(1,cell*.012));
+  for(let i=0;i<3;i++) {
+    rounded(c,cell*(-.125+i*.085),gy-cell*.12,cell*.079,cell*.10,cell*.025,'#d6e6e6',null);
+    line(c,cell*(-.11+i*.085),gy-cell*.043,cell*(-.068+i*.085),gy-cell*.043,'#718c9d',Math.max(1,cell*.009));
+  }
+  c.save();c.translate((handName==='left'?-1:1)*cell*.125,gy+cell*.04);c.rotate((handName==='left'?1:-1)*.6);
+  rounded(c,-cell*.05,-cell*.08,cell*.11,cell*.17,cell*.047,'#c3d8dc','#6b8eaa',1);c.restore();
+  rounded(c,-cell*.13,gy+cell*.105,cell*.26,cell*.09,cell*.025,p.dark,p.edge,1.3);
+  line(c,-cell*.075,gy+cell*.145,cell*.075,gy+cell*.145,p.edge,Math.max(1,cell*.022));
+  c.restore();
+  c.save();
+  c.beginPath();c.arc(x,y,Math.max(3,cell*.056),0,Math.PI*2);c.fillStyle='#f0ffff';c.fill();
+  c.beginPath();c.arc(x,y,Math.max(7,cell*(selected?.13:.10)),0,Math.PI*2);c.strokeStyle=p.edge;c.lineWidth=selected?2:1;c.stroke();
+  const tag=Math.max(9,Math.min(12,cell*.18));
+  rounded(c,x+10,y-19,tag*1.6,tag*1.6,4,'#111e39ed',p.edge);
+  text(c,p.name,x+10+tag*.8,y-19+tag*1.16,tag,p.edge,'center',800);
+  c.restore();
+}
+
 function drawHand(c,r,hand,handName,time,selected,low,reduced) {
   if(!hand || !hand.valid || !finite(hand.x) || !finite(hand.y))return;
   // Do not turn an off-plane observation into a false on-plane pointer by clamping it.
@@ -182,59 +248,118 @@ function drawHand(c,r,hand,handName,time,selected,low,reduced) {
   const p=PALETTE[handName],x=r.x+hand.x*r.cell,y=r.y+hand.y*r.cell;
   const trail=Array.isArray(hand.trail)?hand.trail.slice(-MAX_TRAIL):[];
   if(!reduced) {
+    const validTrail=[];
     for(let i=1;i<trail.length;i++) {
       const a=trail[i-1],b=trail[i],age=time-b.t;
-      if(!finite(a.x)||!finite(a.y)||!finite(b.x)||!finite(b.y)||!finite(age)||age<0||age>.22||b.t<a.t||b.t-a.t>.2)continue;
-      c.save();c.globalAlpha=(1-age/.22)*.5;
-      line(c,r.x+a.x*r.cell,r.y+a.y*r.cell,r.x+b.x*r.cell,r.y+b.y*r.cell,p.glow,Math.max(2,r.cell*.085));c.restore();
+      if(!finite(a.x)||!finite(a.y)||!finite(b.x)||!finite(b.y)||!finite(age)||age<0||age>TRAIL_SECONDS||b.t<=a.t||b.t-a.t>.2)continue;
+      const distance=Math.hypot(b.x-a.x,b.y-a.y);
+      if(distance<.018||distance>7)continue;
+      const ga=bladeGeometry(r.x+a.x*r.cell,r.y+a.y*r.cell,r.cell,handName);
+      const gb=bladeGeometry(r.x+b.x*r.cell,r.y+b.y*r.cell,r.cell,handName);
+      c.save();c.globalAlpha=(1-age/TRAIL_SECONDS)*(low?.07:.15);
+      // The whole blade sweeps a translucent ribbon, not only its observed tip.
+      path(c,[[ga.x,ga.y],[gb.x,gb.y],[gb.baseX,gb.baseY],[ga.baseX,ga.baseY]],p.glow);
+      c.globalAlpha=(1-age/TRAIL_SECONDS)*.55;
+      line(c,ga.x,ga.y,gb.x,gb.y,p.glow,Math.max(3,r.cell*.135));
+      c.globalAlpha=(1-age/TRAIL_SECONDS)*.6;
+      line(c,ga.x,ga.y,gb.x,gb.y,p.edge,Math.max(1.5,r.cell*.039));c.restore();
+      validTrail.push({point:a,age:time-a.t});
+    }
+    const count=low?2:6,stride=Math.max(1,Math.ceil(validTrail.length/count));
+    for(let i=0,drawn=0;i<validTrail.length&&drawn<count;i+=stride,drawn++) {
+      const {point,age}=validTrail[i];if(age<0||age>TRAIL_SECONDS)continue;
+      c.save();c.globalAlpha=(1-age/TRAIL_SECONDS)*(low?.12:.25);
+      saberShape(c,r.x+point.x*r.cell,r.y+point.y*r.cell,r.cell,handName,{ghost:true,low:true});c.restore();
     }
   }
-  c.save();c.lineCap='round';
-  // Fixed decorative blade axis avoids inventing 3D wrist orientation from 2D pose.
-  const sx=handName==='left'?-1:1,baseX=x+sx*r.cell*.20,baseY=y+r.cell*.65;
-  if(!low){c.shadowColor=p.glow;c.shadowBlur=14;}
-  line(c,baseX,baseY,x,y,p.glow,Math.max(4,r.cell*.075));
-  c.shadowBlur=0;line(c,baseX,baseY,x,y,'#effeff',Math.max(1.5,r.cell*.022));
-  line(c,baseX,baseY,baseX+sx*r.cell*.045,baseY+r.cell*.14,'#6f809d',Math.max(5,r.cell*.085));
-  line(c,baseX-r.cell*.07,baseY+r.cell*.012,baseX+r.cell*.07,baseY-r.cell*.012,p.edge,Math.max(2,r.cell*.035));
-  c.beginPath();c.arc(x,y,Math.max(3,r.cell*.065),0,Math.PI*2);c.fillStyle='#efffff';c.fill();
-  c.beginPath();c.arc(x,y,Math.max(7,r.cell*(selected?.115:.09)),0,Math.PI*2);c.strokeStyle=p.edge;c.lineWidth=selected?2:1;c.stroke();
-  const tag=Math.max(9,Math.min(12,r.cell*.18));
-  rounded(c,x+10,y-19,tag*1.6,tag*1.6,4,'#111e39d9',p.edge);
-  text(c,p.name,x+10+tag*.8,y-19+tag*1.16,tag,p.edge,'center',800);
-  c.restore();
+  saberShape(c,x,y,r.cell,handName,{selected,low});
+}
+
+function diamond(c,x,y,radius,color,angle=0) {
+  c.save();c.translate(x,y);c.rotate(angle);
+  path(c,[[0,-radius],[radius*.4,0],[0,radius],[-radius*.4,0]],color);c.restore();
 }
 
 function drawEffect(c,r,e,time,reduced,low) {
   const age=time-e.time;
-  if(!finite(age)||age<0||age>.42||!finite(e.x)||!finite(e.y))return;
+  if(!finite(age)||age<0||age>=EFFECT_SECONDS-1e-9||!finite(e.x)||!finite(e.y))return;
   const x=r.x+e.x*r.cell,y=r.y+e.y*r.cell;
-  c.save();c.globalAlpha=1-age/.42;
+  const progress=age/EFFECT_SECONDS,fade=1-progress;
+  c.save();c.globalAlpha=fade;
   if(e.kind!=='hit') {
     // Quiet feedback; wrong cuts never show the success split.
-    line(c,x-r.cell*.14,y-r.cell*.14,x+r.cell*.14,y+r.cell*.14,'#d7be9d',2);
-    line(c,x+r.cell*.14,y-r.cell*.14,x-r.cell*.14,y+r.cell*.14,'#d7be9d',2);
+    if(age<.35) {
+      c.globalAlpha=1-age/.35;
+      line(c,x-r.cell*.14,y-r.cell*.14,x+r.cell*.14,y+r.cell*.14,'#d7be9d',2);
+      line(c,x+r.cell*.14,y-r.cell*.14,x-r.cell*.14,y+r.cell*.14,'#d7be9d',2);
+    }
     c.restore();return;
   }
-  const p=PALETTE[e.hand]??PALETTE.left;
+  const p=PALETTE[e.hand]??PALETTE.left,style=effectStyle(e.grade,{low,reduced});
   const vectors={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0],any:[0,-1]};
   const [dx,dy]=vectors[e.direction]??vectors.any;
-  const angle=Math.atan2(dy,dx),spread=age*r.cell*(reduced?.2:.8),half=r.cell*.36;
+  const angle=Math.atan2(dy,dx),spread=(reduced?.06:age*(.95+style.tier*.12))*r.cell,half=r.cell*.36;
+  // Local impact flash only. Never pulse the full canvas or shake the camera.
+  if(!reduced&&!low&&age<.14) {
+    const radius=r.cell*(.42+style.tier*.045);
+    const glow=c.createRadialGradient(x,y,0,x,y,radius);
+    glow.addColorStop(0,'#ebfcff8f');glow.addColorStop(.28,`${p.glow}70`);glow.addColorStop(1,`${p.glow}00`);
+    c.globalAlpha=(1-age/.14)*.7;c.fillStyle=glow;c.beginPath();c.arc(x,y,radius,0,Math.PI*2);c.fill();
+  }
+  c.globalAlpha=fade;
+  for(let i=0;i<style.rings;i++) {
+    const radius=r.cell*(reduced?.46:.20+progress*(.75+style.tier*.12)+i*.14);
+    c.save();c.translate(x,y);c.rotate(angle+i*.6);
+    c.strokeStyle=i%2?p.edge:style.color;c.lineWidth=Math.max(1,r.cell*(.038-i*.008))*fade;
+    c.globalAlpha=fade*(i===0?.62:.38);
+    c.beginPath();c.ellipse(0,0,radius,radius*(i===1?.42:1),0,0,Math.PI*2);c.stroke();c.restore();
+  }
+  c.globalAlpha=fade*.9;
   c.save();c.translate(x,y);c.rotate(angle);
   for(const sign of [-1,1]) {
-    c.save();c.translate(age*r.cell*.08,sign*spread);
-    if(!reduced)c.rotate(sign*age*.4);
+    c.save();c.translate(age*r.cell*.08,sign*spread+(reduced?0:age*age*r.cell*.18));
+    if(!reduced)c.rotate(sign*age*(.5+style.tier*.06));
     path(c,[[-half,sign*2],[half,sign*2],[half,sign*half],[-half,sign*half]],p.fill,p.edge,1.2);
-    line(c,-half,sign*2,half,sign*2,'#e8faff',2);c.restore();
+    line(c,-half,sign*2,half,sign*2,'#e8faff',Math.max(2,r.cell*.04));c.restore();
   }
   c.restore();
-  if(!reduced) {
-    const count=low?4:10;
-    for(let i=0;i<count;i++) {
-      const a=angle+i*2.399,dist=age*r.cell*(.8+(i%3)*.3);
-      const px=x+Math.cos(a)*dist,py=y+Math.sin(a)*dist+age*age*r.cell*.35;
-      line(c,px,py,px+Math.cos(a)*r.cell*.045,py+Math.sin(a)*r.cell*.045,i%3?p.edge:'#fff',Math.max(1,r.cell*.022));
-    }
+  const colors=[p.edge,style.color,'#d8fcff','#aaffd8','#ffc7ee'];
+  for(let i=0;i<style.particles;i++) {
+    const a=angle+i*2.399,travel=Math.pow(progress,.72)*r.cell*(.45+(i%5)*.18+style.tier*.12);
+    const px=x+Math.cos(a)*travel,py=y+Math.sin(a)*travel+age*age*r.cell*.43;
+    const length=r.cell*(.045+(i%3)*.032)*fade;
+    c.globalAlpha=fade*(.65+(i%2)*.3);
+    line(c,px,py,px+Math.cos(a)*length,py+Math.sin(a)*length,colors[i%Math.min(colors.length,style.tier+2)],Math.max(1,r.cell*(i%3===0?.045:.020)));
+    if(!low&&i%5===0)diamond(c,px,py,Math.max(1,r.cell*.05*fade),'#f1ffff',a);
+  }
+  for(let i=0;i<style.confetti;i++) {
+    const a=i*2.4+.3,distance=r.cell*(.45+style.tier*.09)*Math.sqrt(progress);
+    const px=x+Math.cos(a)*distance,py=y+Math.sin(a)*distance-progress*r.cell*.35;
+    c.save();c.translate(px,py);c.rotate(a+age*3);c.globalAlpha=fade*.85;
+    rounded(c,-r.cell*.025,-r.cell*.055,r.cell*.05,r.cell*.11,r.cell*.012,colors[i%colors.length]);c.restore();
+  }
+  c.restore();
+}
+
+function drawGradeLabel(c,r,e,time,reduced,low) {
+  const age=time-e.time;
+  if(e.kind!=='hit'||!finite(age)||age<0||age>=EFFECT_SECONDS-1e-9||!finite(e.x)||!finite(e.y))return;
+  const style=effectStyle(e.grade,{low,reduced});if(!style.label)return;
+  const progress=age/EFFECT_SECONDS,alpha=Math.min(1,(1-progress)*2.5);
+  const size=Math.max(11,Math.min(27,r.cell*(.19+style.tier*.017)));
+  const accuracy=finite(e.accuracy)?` · ${Math.floor(clamp(e.accuracy,0,100)+1e-9)}%`:'';
+  const label=`${style.label}${accuracy}`,maxWidth=r.w*.90;
+  c.font=`800 ${size}px ${font}`;
+  const width=Math.min(maxWidth,c.measureText(label).width+24);
+  const x=clamp(r.x+e.x*r.cell,r.x+width/2+2,r.x+r.w-width/2-2);
+  const y=clamp(r.y+e.y*r.cell-r.cell*.58-(reduced?0:progress*r.cell*.18),r.y+size,r.y+r.h-size);
+  c.save();c.globalAlpha=alpha;
+  rounded(c,x-width/2,y-size*.93,width,size*1.48,Math.min(10,size*.4),'#0b183bea',style.color,1.4);
+  if(!low&&!reduced){c.shadowColor=style.color;c.shadowBlur=8;}
+  fitText(c,label,x,y+size*.18,width-14,size,style.color,'center');c.shadowBlur=0;
+  if(style.tier>=3&&!low&&!reduced) {
+    diamond(c,x-width/2-5,y-size*.2,size*.24,style.color,Math.PI/4);
+    diamond(c,x+width/2+5,y-size*.2,size*.24,style.color,Math.PI/4);
   }
   c.restore();
 }
@@ -259,8 +384,10 @@ export function drawSaber(c,w,h,{time=0,bpm=112,slots=[],phase='idle',effects=[]
     const status=slot.status || (phase==='idle'?'양손을 편안하게 준비해요':phase==='paused'?'일시정지':'음악에 맞춰 화살표 방향으로');
     if(!tiny)fitText(c,status,left+section*.5,py,section*.70,small?8:10,'#a5b8d3','center');
     drawNotes(c,r,Array.isArray(slot.notes)?slot.notes:[],time,low);
-    for(const e of effects.slice(-MAX_EFFECTS))if(e.player===player)drawEffect(c,r,e,time,reduced,low);
+    const visibleEffects=effects.slice(-(reduced?4:low?8:MAX_EFFECTS));
+    for(const e of visibleEffects)if(e.player===player)drawEffect(c,r,e,time,reduced,low);
     for(const handName of ['left','right'])drawHand(c,r,slot.hands?.[handName],handName,time,selected?.player===player&&selected?.hand===handName,low,reduced);
+    for(const e of visibleEffects)if(e.player===player)drawGradeLabel(c,r,e,time,reduced,low);
     if(phase==='idle' && !(slot.notes?.length)) {
       const cx=r.x+r.w/2,cy=r.y+r.h*(tiny?.24:.51),titleSize=Math.min(25,Math.max(10,r.w*.060));
       text(c,tiny?'빛을 베어요':'다가오는 빛을 베어요',cx,cy,titleSize,'#deebff','center',700);
