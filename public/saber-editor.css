@@ -1,0 +1,33 @@
+#saber-editor{position:fixed;left:12px;top:12px;margin:0;width:min(420px,calc(100% - 24px));max-height:calc(100dvh - 24px);padding:16px;border:1px solid #526880;border-radius:15px;background:#16263c;color:#edf5ff;scrollbar-width:thin;box-shadow:0 20px 80px #02091399}
+#saber-editor::backdrop{background:#030a149c;backdrop-filter:blur(3px)}
+#saber-editor .saber-editor-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+#saber-editor h2{font-size:18px;margin:0;letter-spacing:-.4px}
+#saber-editor h3{font-size:12px;margin:0 0 9px;color:#d5e4f5;font-weight:700}
+#saber-editor section{border-top:1px solid #34455c;padding:13px 0 2px;margin-top:12px}
+#saber-editor p{font-size:10px;line-height:1.7;margin:7px 0}
+#saber-editor .saber-editor-intro{color:#9eb4ce}
+#saber-editor .saber-editor-song{color:#a9d8e8;font-size:11px;font-weight:600;overflow-wrap:anywhere}
+#saber-editor .saber-editor-notice{min-height:32px;padding:7px 9px;background:#243b51;border-radius:7px;color:#c4e9da}
+#saber-editor .saber-editor-notice[data-error=true]{background:#422e37;color:#ffced0}
+#saber-editor .saber-editor-row{display:flex;align-items:end;gap:7px;margin-bottom:9px;flex-wrap:wrap}
+#saber-editor .saber-editor-field{display:flex;flex:1;flex-direction:column;min-width:0;gap:5px;font-size:10px;color:#aabed6;margin:8px 0}
+#saber-editor .saber-editor-field>span{line-height:1.4}
+#saber-editor .saber-editor-row .saber-editor-field{margin:0}
+#saber-editor input,#saber-editor select,#saber-editor textarea{font:11px "Segoe UI","Malgun Gothic",sans-serif;color:#ecf4ff;background:#20354d;border:1px solid #47627d;border-radius:7px;padding:7px;max-width:100%;width:100%}
+#saber-editor input[type=checkbox]{width:17px;height:17px;accent-color:#92dbc3;margin:7px 0}
+#saber-editor input[type=range]{padding:0;accent-color:#96dfc9}
+#saber-editor input[type=file]{font-size:10px;padding:5px}
+#saber-editor input[type=number]{min-width:64px}
+#saber-editor select[size]{height:113px;scrollbar-width:thin;font-variant-numeric:tabular-nums;padding:4px}
+#saber-editor select[size] option{padding:5px 4px;font-size:10px}
+#saber-editor textarea{resize:vertical;font:10px/1.6 Consolas,monospace;min-height:75px;max-height:240px;white-space:pre}
+#saber-editor button{font:600 10px "Segoe UI","Malgun Gothic",sans-serif;padding:8px 10px;border:1px solid #54718b;border-radius:7px;background:#28435e;color:#e4f0fc;min-height:32px}
+#saber-editor button:disabled{opacity:.4;cursor:not-allowed}
+#saber-editor .saber-editor-primary{color:#163a36;background:#a4e4cc;border-color:#bae9d7}
+#saber-editor .saber-editor-clock{float:none;color:#c1d9f0;font-size:11px;font-variant-numeric:tabular-nums;margin-left:auto;align-self:center;white-space:nowrap}
+#saber-editor small{font-size:9px;line-height:1.7;color:#99b0c9;display:block;margin:8px 0}
+#saber-editor .saber-editor-preview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:7px;border:1px solid #314663;border-radius:9px;background:#0d1b30;min-height:97px}
+#saber-editor .saber-editor-cell{display:grid;place-items:center;border:1px solid #263a58;border-radius:5px;color:#456183;min-height:24px;font-size:12px;font-weight:700}
+#saber-editor .saber-editor-cell[data-hand=left]{border-color:#fa7a9c;background:#9a335d;color:#fff2f6}
+#saber-editor .saber-editor-cell[data-hand=right]{border-color:#70d7f9;background:#22629a;color:#effcff}
+@media(max-width:440px){#saber-editor{padding:12px}#saber-editor h2{font-size:16px}#saber-editor .saber-editor-row{gap:5px}#saber-editor button{padding:7px}#saber-editor .saber-editor-clock{font-size:10px}}

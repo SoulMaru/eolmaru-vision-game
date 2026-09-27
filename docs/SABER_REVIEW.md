@@ -79,3 +79,104 @@ ISSUES의 후속 구현 ID와 연결: SB0-01→SB01, SB0-02→SB02, SB0-03→SB0
 **0단계 독립 검토 완료: 다음 단계 설계를 막는 미해결 모순을 발견하지 않았다.** 단계1에 착수할 수 있다. 이번 결과는 설계와 현행0.3의 기준 상태 확인이며 세이버1인/2인 구현 완료 또는 실기 통과를 뜻하지 않는다.
 
 다음 AI 검색어: `MediaPipe pose anatomical wrist identity slot reassignment`, `2D swept segment audio timestamp grace window`, `audio chart offset input latency separate`, `Fullscreen pending request exit generation`, `rhythm immutable chart per player terminal state`.
+
+## 단계1~9 실행 — 독립 검토 준비
+
+사용자가 추가 승인 없이 남은 단계를 진행하도록 요청했다. 이번 구현의 시작 HEAD는 `ef62158`이며 검토엔진이 시작 시 변경 없는 상태를 확인했다. 앞의 단계0 기록은 당시 설계/기준 검사 이력으로 보존한다. 이번 새 기능은 실제 구현과 검사를 마친 항목만 별도로 완료 표시한다.
+
+검토엔진의 소유 범위는 `tests/review-saber.test.mjs`와 이 문서의 추가 기록이다. 앱 소스는 생성엔진이 수정하며, 발견한 결함을 검토엔진이 대신 구현하지 않는다. 기존41개 검사를 보존한다.
+
+### 단계1~3 검사 계획
+
+| 영역 | 독립 확인할 경계 |
+|---|---|
+| 채보 | 원본 불변·초/마이크로초 정규화·2박 간격의1μs 오차·동시 묶음의 손/칸·유효/무효 offset·음수 spawn·끝1초 여백·파일/노트 상한 |
+| 교차 판정 | 끝점 밖→밖 관통, 실제 교차시각과 시간창, 잘못된 손/방향, any의 움직임 조건, 정지/떨림, 한 stroke 한 블록, 동일 노트의 중복 접촉 |
+| 유예와 관측 | 창 끝 뒤 도착한 유효 표본, 유예 경계와 확정 후 재등장 금지, 관측80% 바로 아래/정확히/위, 겹치는 구간 합집합, 가림 뒤 복귀 |
+| 입력 연속성 | 첫 표본, 같은 frameId, 같은/역행 시각,0.20초 경계, 손별 상태, 세션/epoch/reset, 불연속 점프와 과거 궤적 폐기 |
+| 표본률 | 동일 실제 궤적을8/12/20Hz로 나눈 판정 비교 및 표본 누락. 프레임별 최소 거리 때문에 높은 표본률에서만 탈락하는 경로 확인 |
+| 2인 | 불변 채보만 공유하고 노트 상태·양손 표본·stroke·효과는 각자 소유. 같은 note.id를 각 플레이어가 한 번씩 처리 |
+
+이 표는 검사 계획이며 통과 결과가 아니다. 새 API/구현을 읽고 실제 재현·실행 결과를 아래에 추가한다. 카메라를 켜지 않은 순수/합성 검사로 실제 사람의 베기 정확도를 주장하지 않는다.
+
+### 단계1~3 순수 모듈 1차 결과
+
+새 `saber-chart.mjs`, `saber-input.mjs`, `saber-core.mjs`를 직접 읽고 독립 파일 `tests/review-saber.test.mjs`를 작성했다. 첫 실행 `node --test tests/review-saber.test.mjs`는 **22개 중21개 통과,1개 실패**였다. 기존41개 검사와 앱/화면 통합 결과는 이 수치에 포함하지 않는다.
+
+통과 범위: 채보 원본 불변/동결, 마이크로초 정규화와1μs 허용, 동시 묶음/전체2박, offset 적용 후 접근·끝 여백, 잘못된 형식/enum/곡 소유/1MB·2000개 제한,40/112/240BPM×120/150/180초×±0.25초 패턴 생성과 JSON 왕복, 선분 관통/평행/경계, 늦은 표본의 교차10.24초 명중, 잘못된 손/방향/any·정지·작은 움직임, 한stroke 한노트, 플레이어별 독립 상태, 관측구간 합집합과80% 경계, 유예 경계·최종확정 뒤 재등장 금지, 가림 후 유예 내 복귀, seek의 무득점 건너뜀, epoch/세션/손/입력원 초기화,0.20초 간격과trail 상한, 구역 충돌 비움, 같은 배율의 좌표 보정,8/12/20Hz에서 동일 느린 궤적1회 명중과 정지손 무명중, 긴 표본 공백의 유령 베기 방지.
+
+| 발견 | 실제 재현 | 상태 |
+|---|---|---|
+| SR01 (검사명 SB1) | 신뢰도에 NaN/Infinity를 넣으면 `< .55` 비교가 false여서 HandTracker가 정상 선분을 반환한다. 순수 판정에도 같은 형태의 경계가 있어 잘못된 관측이 유효해질 수 있다. `tests/review-saber.test.mjs`의 invalid confidence 검사에서 실제 실패를 확인했다. | 해결. 생성엔진이 입력/판정 양쪽에 유한수 및0.55~1 범위 검증을 추가했고 독립 재실행 통과 |
+
+이어 시간창 전 통과의 배제/시간창과 공간의 동시 겹침, 두 플레이어의 양손 동시 노트 총4개 분리를 추가했다. 두 검사는 통과했고 **총24개 중23개 통과, SR01 한 개 실패**였다. 신뢰도1 초과도 무효 입력 사례에 포함했다. 수정 전에 실패를 숨기거나 통과로 바꾸지 않았다.
+
+이번 시험은 합성 좌표·순수 판정으로 실행했으며 실제 카메라나 두 사람을 촬영하지 않았다. 그림/효과·오디오 재생·전체화면·파일 선택/편집 UI의 통합은 후속 검토 대상이다.
+
+### SR01 수정 뒤 직접 재실행
+
+검토엔진이 `node --test tests/review-*.test.mjs`를 직접 실행해 **65개 통과, 실패0, 건너뜀0,163.7ms**를 확인했다. 기존41개와 새 세이버24개다. 이 수치는 아래 통합 경계를 추가하기 전 결과이며 이후 검사를 무조건 통과로 뜻하지 않는다.
+
+### 단계4~8 통합 소스 독립 검토
+
+`src/saber-game.mjs`, `app.mjs`, `saber-editor.mjs`, `saber-render.mjs`를 직접 읽었다. 소스는 수정하지 않았다. 같은 검사 파일에 DOM을 최소 모형화한 SaberGame 검사와 음악 정지 경계를 추가했다. 첫 추가 실행은 **29개 중27개 통과,2개 실패,130.9ms**였다. 이 검사는 카메라/브라우저를 사용하지 않는 합성 통합 검사다.
+
+| ID | 재현과 영향 | 상태 |
+|---|---|---|
+| SR02 | 기본 JSON fetch 응답을 늦추고 먼저 Maru Flow에 사용자 채보를 적용한다. 앱의 응답 적용 조건에 사용자 채보 세대/소유가 없어 늦은 기본 응답이 편집 결과를 덮는다. | 해결. chartRevision/editor 열림 보호 소스 확인 후 아래 독립 브라우저 import/editor 지연 시험 통과 |
+| SR03 | 채보 file.text()를 지연시키는 동안 곡 선택/BPM 변경이 가능하다. chartLoading에 곡 메뉴/파일 처리 잠금이 연결되지 않아 await 뒤 다른 track에 적용될 수 있다. | 해결. 메뉴/핸들러 잠금과 await 뒤 대상 확인 소스 확인 후 아래 독립 브라우저 file/stale-editor 시험 통과 |
+| SR04 | 카메라의5초 범위 보정을 시작한 뒤 전신으로 전환한다. configure가 calibrationTask를 남기고 전신에서는 saber.tick이 돌지 않아 시작 버튼이 계속 막힌다. | 해결. 초기 실패 뒤 생성엔진의 configure 취소 수정을 직접 재검사해 통과 |
+| SR05 | 음악 currentTime이10초에 고정된 waiting 상태에서 capturedAtMs만100ms 진행한 좌우 손 선분을 관측한다. 두 음악 시각이 모두10이어도 hit가 반환된다. | 해결. HandTracker/core가 동시 음악시각을 거절하고 app waiting에서 입력을 초기화한다. 독립 실패 회귀 통과 |
+| SR06 | 정상 음악 진행에서 렌더링이650ms 늦어지면 currentTime의0.5초 전진을 seek로 오인해 세션 counts를 초기화한다. 기존 hit가1에서0으로 사라진다. | 해결. 실제 seeking 이벤트와 벽시계 경과 대비 음악 점프를 구분한다. 지연 보존/실제 seek 초기화 독립 회귀 모두 통과 |
+
+추가 통과 범위: 일시정지·재개에서 입력 초기화 후 과거 손 이동이 이어지지 않고 새 세션이 결과를 비움, 잘못된 채보 import가 이전 채보를 보존, 채보 offset과 입력 지연 보정의 별도 적용,2인 중 한 자리 소실/복귀 시 해당 자리의 양손 궤적만 비움.
+
+편한 손 범위 보정의 등방성·고정 보존·수동 범위 변경 후 재보정과650ms 지연 회귀를 추가한 다음 실행은 **31개 중29개 통과,2개 실패,128.2ms**였다. SR04는 이 실행에서 해결됐고 SR05/SR06은 계속 실패했다. 정상 범위 보정 검사는 통과했다.
+
+새 브라우저 흐름·실제 전체화면·오디오 청취·실제 사람1/2인 카메라 정확도는 위 순수 검사로 대체하지 않는다. 생성엔진의 별도 수행 결과와 사람 실기 대기 항목을 구분해 최종 기록한다.
+
+### 통합 경계 수정 뒤 최종 직접 검사
+
+생성엔진의 수정 후 검토엔진이 직접 전체 파일을 실행해 먼저72/72 통과를 확인했다. 이어 실제 Audio의 `seeking` 이벤트 모형 회귀를 추가하고 `node --test tests/review-*.test.mjs`를 실행한 **마지막 결과는73개 통과, 실패0, 건너뜀0,180.9ms**다. 기존41개 + 새 세이버32개이며 렌더/편집기 에이전트가 별도로 보고한18개는 이 수치에 포함하지 않는다.
+
+수정 근거 위치(2026-09-27 통합본): `src/app.mjs:51`·`:53`의 사용자 채보 revision/기본 응답 보호, `:64`·`:65`·`:88`·`:143`·`:155`의 읽기 대상/잠금, `:242`의 waiting 초기화, `src/saber-game.mjs:20`의 명시적 seek, `:22`의 보정 취소, `:88` 이후의 실제 경과시간 구분, `src/saber-input.mjs:51`·`src/saber-core.mjs:36`의 음악 정지 판정 거절을 직접 읽었다.
+
+검토엔진이 찾은 SR01~06에 대해 현재 소스상 미해결 차단 문제는 없다. 이 판단 범위는 채보/입력/판정/앱 연결의 소스와 합성 회귀다. 아직 완료하지 않은 실제 사람 카메라 정확도·체감 지연·청취를 완료로 바꾸지 않는다. 브라우저 경합/화면 증거는 생성엔진 보고가 도착하면 수행 주체를 명시하여 연결한다.
+
+### 독립 합성 카메라·외부 HTTPS 차단 브라우저 검사
+
+검토엔진이2026-09-27 KST16:36~16:38에 직접 실행했다. 앱 소스는 수정하지 않았고 재현 스크립트 `tests/browser-saber-camera.js`만 추가했다. 별도 `saber-offline-camera` 세션의 HeadlessChrome153에서 `--use-fake-device-for-media-stream,--use-fake-ui-for-media-stream`로 합성 장치를 사용했다. `about:blank`에서 `network route 'https://**' --abort`를 먼저 적용한 뒤 `http://127.0.0.1:8765/`를 새로 열었다. 이 과정은 물리 카메라를 켜거나 실제 사람을 촬영하지 않는다.
+
+기존 UI로 손동작 리듬·2인·카메라를 선택하고 실제 클릭 입력으로 시작했다. `eval --stdin`으로 스크립트를 실행해 **13개 중13개 통과**를 확인했다. 검사 중 Canvas의 원래 fillText를 그대로 호출하는 읽기 관측으로 이미 그려진 두 플레이어의 분류 문자열을 확인했으며, 인식 결과·손 위치·판정 시계·판정 함수는 바꾸지 않았다. 검사 종료 시 원래 함수를 복원하고 음악/카메라를 종료했으며 별도 브라우저도 닫았다.
+
+| 직접 확인 | 결과 / 해석 범위 |
+|---|---|
+| 입력 장치 | `fake_device_0`,960×540,합성 영상20fps,마이크 트랙0개. 실제 사람 영상이 아님 |
+| 로컬 인식 준비 | `/vendor/vision/wasm/vision_wasm_internal.wasm`와 `/models/pose_landmarker_lite.task`가 localhost HTTP200으로 로드됨. MediaPipe graph 시작 및 GPU delegate 표시 확인 |
+| 추론 표시 | 기본 최대12Hz 설정에서3초 동안250ms 간격12회 관측:11fps,5~8ms,GPU. 이 값은 합성 무검출 영상의 추론 표시이며 화면 FPS·실제 두 사람·물리 GPU 성능 보증이 아님 |
+| 두 플레이어의 무검출 처리 | 두 자리 모두 `베기0 · 방향/손0 · 놓침0 · 인식 안 됨3`. 사람 없는 영상이 hit 또는 정상 관측 miss로 바뀌지 않음 |
+| 음악/종료 | 카메라 플레이 중 음악 시각 진행 확인. 그만하기와 카메라 끄기 뒤 오디오 paused·srcObject null·영상 트랙 ended 확인 |
+| 외부 요청 | 성능 ResourceTiming29개 중 외부0. 별도 CLI 네트워크 로그30건 중 외부0,HTTP400 이상0. 모델/WASM 외에도 음원/음성/채보가 로컬 |
+| 오류 | CLI page errors 출력 없음, 검사 중 error/unhandledrejection0. 런타임 예외를 발견하지 않음 |
+| 비차단 모델 경고 | 콘솔에 `OpenGL error checking is disabled`, `Using NORM_RECT without IMAGE_DIMENSIONS...` 두 경고가 있음. graph는 시작/종료에 성공했으나 경고 없는 실행이라고 보고하지 않음. 검색어: `MediaPipe PoseLandmarker NORM_RECT IMAGE_DIMENSIONS square ROI` |
+
+재현: 새 합성 세션을 열고 HTTPS 차단→로컬 페이지→손 리듬/2인/카메라/시작 순으로 준비한 후 `Get-Content -Raw -Encoding UTF8 tests/browser-saber-camera.js | npx --yes agent-browser --session saber-offline-camera eval --stdin`를 실행한다. 이 스크립트는 합성 장치 이름을 검사하며 실제 카메라 세션에서는 실행하지 않는다. CLI `errors`, `console`, `network requests --json`도 별도로 확인한다.
+
+생성엔진이 보고한 이번 브라우저 결과는 `browser-flow`15/15(동일 블록을 두 플레이어가 독립 포인터로 베기 포함), `browser-profiles`8/8, `browser-show`9/9(Fullscreen/fallback 포함)다. 검토엔진의 위13개와 수행 주체를 구분한다. 본 독립 실행은 실제 사람1/2인의 성공 베기 정확도·150초 실제 완주·스피커 청취·체감 지연 검사를 대신하지 않는다.
+
+### SR02/SR03 독립 브라우저 지연 응답 회귀
+
+검토엔진이 별도 `saber-chart-races` 세션에서 직접 실행했다. 테스트용 `tests/browser-saber-races-init.js`를 최초 탐색 전에 등록하고 각 시나리오마다 새로운 로컬 페이지를 열었다. 이 init script는 기본 채보의 실제 로컬 응답을 gate로 보류하고, 정상 fallback과 같은 내용을 덮어쓴 경우도 관측할 수 있도록 유효한 노트 ID에 `delayed-` 접두어만 붙인다. 지정한 합성 File의 `text()` 반환도 별도 gate로 지연시킨다. 해당 코드는 앱에 포함하지 않으며 앱 파일·비공개 state·판정 함수는 수정하지 않는다.
+
+`tests/browser-saber-races.js`를 실제 DOM 이벤트와 편집기 UI 경로로 실행하여 **4개 시나리오,24개 검사 모두 통과**, CLI page errors0을 확인했다. 카메라·마이크는 사용하지 않았다.
+
+| 새 페이지 query / 검사 수 | 직접 확인한 결과 |
+|---|---|
+| `?race=import` /5 | 기본 응답을 보류한 동안 사용자가 가져온 채보를 적용. 기본 응답을 해제한 뒤 편집기를 다시 열어 사용자 노트가 보존됨을 확인 |
+| `?race=editor` /6 | 편집 중인 미적용 초안이 늦은 기본 응답 뒤에도 열려 있고 내용이 같음. 초안을 닫고 다시 열어 실제 게임의 원본 채보도 덮어쓰지 않았음을 확인 |
+| `?race=file` /8 | File.text 지연 중 곡 선택/재선택/BPM/Play/편집기/모드 버튼 잠금. disabled UI를 건너뛰어 기존 onclick/onchange를 직접 호출해도 모드·노래·시작 경계가 차단됨. 완료 뒤 잠금이 풀리고 원래 곡에 정확한 채보가 적용됨 |
+| `?race=stale-editor` /5 | 이미 열린 편집기와 합성 파일 change 이벤트를 겹치는 강제 경합. 편집기에서 새 채보를 적용해 revision이 바뀐 뒤 이전 File.text 응답을 해제하면 읽기 취소 안내가 표시되고 새 채보가 보존됨 |
+
+모드 변경은 정상 UI와 핸들러 두 경로 모두 읽기 중 차단되어 실제 stale 모드를 만들지 않는다. 모듈의 비공개 state를 강제로 변조해 모드가 바뀐 것처럼 꾸미지 않았다. await 뒤 `state.mode` 방어 조건은 소스 검토, 실제 stale revision 응답 거절은 위 네 번째 브라우저 시나리오로 각각 구분해 검증했다. 테스트는 편집기 열림을 중간 확인으로 포함하므로24개를24개의 서로 다른 제품 기능이라고 해석하지 않는다.
+
+재현: `npx --yes agent-browser --session saber-chart-races --init-script tests/browser-saber-races-init.js open 'http://127.0.0.1:8765/?race=import'` 후 `Get-Content -Raw -Encoding UTF8 tests/browser-saber-races.js | npx --yes agent-browser --session saber-chart-races eval --stdin`. 같은 세션에서 위 나머지 query로 각각 새로 open하고 스크립트를 실행한다. 검사를 마친 뒤 세션을 닫는다.

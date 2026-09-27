@@ -6,10 +6,10 @@
 |---|---|---|---|
 | H01 | 두 사람이 실제 카메라 양쪽에서 손을 뻗기 | 좌우 고정 슬롯·가운데6% 완충구역 | 1인/2인 완주, 한명퇴장, 교차/가림. `MediaPipe PoseLandmarker numPoses occlusion identity` |
 | H02 | 카메라 가까이 앉거나 발/손이 프레임 밖 | 보이는 신뢰도 있는 상체만 비교; 목/하체 안내 유지 | 손 리듬 의자/서기 전신/누운 매트 카메라 구도. `MediaPipe pose wrist visibility standing supine partial body` |
-| H03 | 박자에 맞췄는데 체감상 늦음 | 오디오 시계 기준 ±300ms 보정 제공 | 실제 카메라 지연을 관측한 뒤 기본값 조정. `rhythm game audio input latency calibration` |
+| H03 | 박자에 맞췄는데 체감상 늦음 | 오디오 시계 기준 세이버 입력 ±250ms 보정, 채보offset별도 | 실제 카메라 지연을 관측한 뒤 기본값 조정. `rhythm game audio input latency calibration` |
 | H04 | 인식마다 화면이 잠깐 끊김 | 기본12Hz, 추론85ms 초과시 최대8Hz, 640px, GPU→CPU fallback | 사람2명 실측 후 필요시 Worker 전환. `MediaPipe Tasks Vision OffscreenCanvas worker wasm module` |
 | H05 | 한국어 안내/음악의 발음·음량 | F 해미 음성·별도 볼륨·음악 ducking | 사람 청취. `Windows SAPI Korean Heami pronunciation` |
-| H06 | 사용자 곡의 비트가 채보와 안 맞음 | 사용자 BPM 입력, 파일 시작0초 기준 규칙적 채보 | 인트로 오프셋·변박 자동분석은 미구현. 우선 기본곡 사용. `audio beat detection onset tempo offset local` |
+| H06 | 사용자 곡의 비트가 채보와 안 맞음 | 사용자 BPM 연습채보, 편집기에서offset·노트시각수정/JSON입력가능 | 인트로·변박 자동분석은 미구현. 기본곡 또는수동편집사용. `audio beat detection onset tempo offset local` |
 | H07 | 발끝/목의 움직임을 정확하게 평가하고 싶음 | 해당 동작 시간 안내, 수행/효과 점수 없음 | 다중시점·개인 보정·실제 영상 검증 없이는 정밀 기능이라고 주장하지 않음 |
 
 ## 수정 확인된 문제
@@ -39,7 +39,20 @@
 - F01: 내장브라우저/iframe에서Fullscreen권한거절가능 → 실패상태를표시하고창에서도진행;Start-Eolmaru.cmd로Chrome/Edge에서다시열기. `Fullscreen API transient activation permissions policy iframe allowfullscreen`.
 - A01: 시범소리음높이·음악밸런스의사람청취미검증. `Web Audio oscillator cue timing perceived latency`.
 
-## 세이버 전환 — 단계 0에서 확인한 후속 구현 항목
+## 세이버 0.4 수정 및 남은 항목
+
+- SB01~06은 새연속입력/순수판정/슬롯/독립채보/타격음/공유전신보존으로 구현했다. 상세 증거는 SABER_REVIEW 및 TEST_RESULTS. 아래0단계 표는 당시대기이력이다.
+- SR01: confidence NaN/Infinity가 판정을 통과할 수 있음 → .55~1 유한수만 허용, tracker/core 독립회귀.
+- SR02: 늦은기본채보 fetch가 사용자편집을 덮을 수 있음 → 채보세대/편집기/활성상태 검사.
+- SR03: 비동기 JSON읽기 중 곡/모드전환 경합 → UI잠금+읽기후곡동일성/세대/모드검사.
+- SR04: 모드/채보변경 뒤5초보정 task가남아시작잠금 → configure가보정취소.
+- SR05: waiting으로멈춘동일음악시각의손이동을베기로처리 → 같은음악시각거절+궤적초기화.
+- SR06: 650ms정상렌더지연을탐색으로오인해누적기록초기화 → 실제seeking이벤트와벽시계대비점프구분.
+- SB07의8/12/20Hz합성경계와새외부차단카메라실행은검사했다. **실제1~2인사용자완주/가림/손교차/체감지연은대기**다. H01~05절차대로확인한다.
+- MP01: 합성GPU실행때 MediaPipe의NORM_RECT IMAGE_DIMENSIONS경고. 초기화/추론은지속되고페이지오류0. 실영상의구도·비정사각ROI정확도는별도관찰. `MediaPipe NORM_RECT IMAGE_DIMENSIONS non square ROI warning`.
+- 편집기의곡ID는builtin과local을구분하지만 임의local파일의음악해시까지검사하지 않는다. 내보낸JSON은같은음악과함께사용한다. 자동BPM/VR/3D실제메시절단/신원고정/온라인랭킹은현행메뉴에없다.
+
+## 세이버 전환 — 단계 0 당시 확인한 후속 구현 항목 이력
 
 2026-09-27 KST, 기준 fdbd8b4. 아래는 현행 0.3의 새 장애를 재현했다는 뜻이 아니라, 새 세이버 요구와 현행 구조의 차이다. 이번에는 코드 수정 없이 설계/검토했으며 구현은 미완료다. 진행표: [SABER_PROGRESS](SABER_PROGRESS.md), 독립 근거: [SABER_REVIEW](SABER_REVIEW.md).
 
@@ -52,3 +65,5 @@
 | SB05 | expireNotes는 현재 시각으로 즉시 만료함 | 교차 시각 판정과 유한 유예 뒤 miss/untracked 구분. 창 끝 뒤 도착한 유효 표본 검사 | 단계 3 대기. `rhythm delayed sample watermark grace period` |
 | SB06 | show-render의 전신 그림도 show의 ACTS/drawWorld에 의존 | 리듬만 교체, 공유 렌더 보존. 전신 225초/누운 무채점/커플 회귀 | 단계 1~9 공통. `shared renderer dependency regression` |
 | SB07 | 아직 실제 웹캠의 세이버 궤적/도달 범위/2인 체감 지연을 측정한 결과 없음 | 8/12/20Hz 합성과 실제 1인/2인·가림·손 교차를 분리 기록 | 단계 4/6/9 대기. `low fps wrist interpolation false positive calibration` |
+
+- SR07: 0.4 브랜드 문구 변경으로 실행기의 기존서버 식별 문자열이 사라짐 → 고정 application-name 메타데이터 EOLMARU VISION을 추가해 표시이름과분리. 서버가이미실행중인상태에서 tools/launch.ps1 실제실행으로 기존서버재사용과브라우저열기를확인했다. `PowerShell local server identity launch existing instance`.

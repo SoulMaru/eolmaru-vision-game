@@ -13,12 +13,21 @@
   $('pause').click();const frozen=$('music').currentTime;await delay(300);
   check('pause freezes audio clock',Math.abs($('music').currentTime-frozen)<.02);
   $('pause').click();await until(()=>!$('music').paused&&!$('pause').disabled);
-  // Keep focus on the button: direction keys must still reach the game after resume.
-  $('pause').focus();$('music').currentTime=60/112*8;
-  document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyA',bubbles:true}));
-  document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{code:'ArrowLeft',bubbles:true}));
-  await delay(120);
-  check('both players independently match same beat',$('p1-points').textContent==='1'&&$('p2-points').textContent==='1');
+  // Continuous real pointer samples cross the same first block in each player plane.
+  const {gridToStage}=await import('/src/saber-render.mjs');
+  const raw=await fetch('/charts/maru-flow.saber.json').then(r=>r.json()),first=raw.notes[0];
+  const move=(player,x,y)=>{const r=$('stage').getBoundingClientRect(),p=gridToStage(x,y,r.width,r.height,2,player);$('stage').dispatchEvent(new PointerEvent('pointermove',{clientX:r.left+p.x,clientY:r.top+p.y,bubbles:true}));};
+  $('music').currentTime=first.time+raw.offsetSeconds-.23;await delay(45);
+  for(const player of [0,1]){
+    $('saber-player').value=String(player);$('saber-player').dispatchEvent(new Event('change'));
+    $('saber-hand').value='left';$('saber-hand').dispatchEvent(new Event('change'));
+    move(player,1.5,.85);await delay(32);
+    for(const y of [1.02,1.20,1.39,1.58]){move(player,1.5,y);await delay(20);}
+  }
+  await delay(100);
+  check('both players independently cut the same block',$('p1-points').textContent==='1'&&$('p2-points').textContent==='1');
+  // A held hand does not keep cutting. Timing alone never awards a hit.
+  await delay(350);check('held hands cannot repeat a cut',$('p1-points').textContent==='1'&&$('p2-points').textContent==='1');
   $('music').currentTime=149.5;await until(()=>$('result-dialog').open);
   check('rhythm completes without elimination',$('result-cards').children.length===2);
   check('result has no score or combo rewards',!$('result-cards').textContent.includes('콤보')&&!$('result-cards').textContent.includes('리듬 점수'));
