@@ -1,0 +1,72 @@
+{
+  "id": "maru-flow",
+  "title": "Maru Flow · 마루의 산책",
+  "file": "maru-flow.ogg",
+  "artist": "얼마루 비전게임",
+  "bpm": 112,
+  "duration": 150.0,
+  "durationSeconds": 150,
+  "beatOffsetSeconds": 0,
+  "beats": 280,
+  "bars": 70,
+  "timeSignature": "4/4",
+  "sampleRate": 44100,
+  "channels": 2,
+  "seed": 20260927,
+  "license": "CC0-1.0",
+  "vocals": false,
+  "externalSamples": false,
+  "engine": {
+    "mode": "F-drive-signature-soundtrack-plus-original-arrangement",
+    "source": "F:\\0.SoulmaruAI\\1.aiimage\\webtoon-translator\\local-api\\backend\\python\\video\\webtoon.py",
+    "function": "signature_soundtrack",
+    "sha256": "de182299dbf5216aaeaaa08303ae19c8785a537518b9ba1d3e44f6164edf3df3",
+    "use": "Original five-second motif, rendered with bell=False; intro and ending only."
+  },
+  "generator": "tools/music-compose.py",
+  "sections": [
+    {
+      "name": "intro",
+      "startBar": 0,
+      "endBar": 8,
+      "startSeconds": 0.0
+    },
+    {
+      "name": "groove-a",
+      "startBar": 8,
+      "endBar": 24,
+      "startSeconds": 17.142857
+    },
+    {
+      "name": "lift-a",
+      "startBar": 24,
+      "endBar": 40,
+      "startSeconds": 51.428571
+    },
+    {
+      "name": "breathing-space",
+      "startBar": 40,
+      "endBar": 48,
+      "startSeconds": 85.714286
+    },
+    {
+      "name": "lift-b",
+      "startBar": 48,
+      "endBar": 64,
+      "startSeconds": 102.857143
+    },
+    {
+      "name": "outro",
+      "startBar": 64,
+      "endBar": 70,
+      "startSeconds": 137.142857
+    }
+  ],
+  "measurements": {
+    "masterPeak": 0.84,
+    "masterRms": 0.127514,
+    "fileBytes": 1414330,
+    "sha256": "a940becf5467a95501eed896ac1b860cc90c764239ed18ed2eac5c7090d79cb3"
+  },
+  "review": "Duration, peak, stereo format and byte hash verified automatically; human listening still required."
+}

@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "language": "ko-KR",
+  "title": "얼마루 한국어 코치",
+  "generatedAt": "2026-09-27T01:10:14.776Z",
+  "engine": {
+    "name": "Windows SAPI / System.Speech",
+    "voice": "Microsoft Heami Desktop",
+    "studioScript": "F:\\0.SoulmaruAI\\1.aiimage\\webtoon-translator\\local-api\\backend\\python\\speech.ps1",
+    "studioScriptSha256": "8f68aaa725d41138bde95c1f54cb9067a3b1b430385018fb879d036639209bbf",
+    "source": "F-drive voice studio",
+    "rate": 1,
+    "networkRequired": false,
+    "gpuRequired": false,
+    "impersonation": false
+  },
+  "rights": "Original project scripts spoken by an installed Windows system voice. No speech engine, model or recorded human voice is redistributed.",
+  "verification": "Each encoded file inspected with ffprobe; duration, bytes and SHA-256 recorded. Human listening and in-game sound balance remain manual checks.",
+  "cues": {
+    "ready": {
+      "text": "준비됐나요? 잠시 후 시작해요.",
+      "file": "/audio/voice/ready.ogg",
+      "durationSeconds": 2.922,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 16314,
+      "sha256": "384d5469fabc2a445ffa9aee88b906ae18c0b1af58ce387dd753c65115a64675"
+    },
+    "start": {
+      "text": "시작해요. 편안하게 움직여 주세요.",
+      "file": "/audio/voice/start.ogg",
+      "durationSeconds": 2.964042,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 16394,
+      "sha256": "35ec623c5ec6b4d3292882c19827f447efb9ca8e6b83317661c9382ae83ddb9f"
+    },
+    "open": {
+      "text": "팔을 편안한 높이로 벌려 주세요.",
+      "file": "/audio/voice/open.ogg",
+      "durationSeconds": 2.039167,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 15623,
+      "sha256": "0a46d8a98222ed7813ce65ce09d626db8473083acfc309e3525a984469fa9d77"
+    },
+    "up": {
+      "text": "두 손을 천천히 위로 뻗어 주세요.",
+      "file": "/audio/voice/up.ogg",
+      "durationSeconds": 2.0905,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 15433,
+      "sha256": "7175ffcb6bca2906cc6f5c8a0f983ea03bacdd6869e51e472b96fbe45738134d"
+    },
+    "left": {
+      "text": "화면 왼쪽으로 조금만 기울여 주세요.",
+      "file": "/audio/voice/left.ogg",
+      "durationSeconds": 2.29525,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 17095,
+      "sha256": "476f9d62f04c67f11d7562bcfe9f3c6c532c75bf1f7b4701c407249d26f6ea8a"
+    },
+    "right": {
+      "text": "화면 오른쪽으로 조금만 기울여 주세요.",
+      "file": "/audio/voice/right.ogg",
+      "durationSeconds": 2.389292,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 17563,
+      "sha256": "9b35efc80728abc5d226e1b567b663545a2d313c11acb112bdc2783c2d78075a"
+    },
+    "rest": {
+      "text": "어깨의 힘을 풀고 잠시 쉬어요.",
+      "file": "/audio/voice/rest.ogg",
+      "durationSeconds": 1.863,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 14175,
+      "sha256": "8830958501a3b9e0d829af009962e45c3fd32d9210d67d81fbc780c5ceb288db"
+    },
+    "finish": {
+      "text": "오늘도 잘 움직였어요. 수고했어요.",
+      "file": "/audio/voice/finish.ogg",
+      "durationSeconds": 3.100042,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 17263,
+      "sha256": "5bc7fd6e8be1cc49435f0f50c1e8c3c64b80a3e565dce1a59034ee0f1e34a962"
+    },
+    "pause": {
+      "text": "잠시 쉬어 가요.",
+      "file": "/audio/voice/pause.ogg",
+      "durationSeconds": 1.068917,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 9344,
+      "sha256": "1b89cd59c8d0781000397a2dfd1ecc5bc58dd4e013ce6643df12ebfa5271453b"
+    },
+    "prepare-body": {
+      "text": "안정된 의자에 앉고, 두 발을 바닥에 놓아 주세요.",
+      "file": "/audio/voice/prepare-body.ogg",
+      "durationSeconds": 3.632875,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 22920,
+      "sha256": "7360d90ec86e90ab43cb18224842044611488704b5c20be8a89066adb65773da"
+    },
+    "neck-left": {
+      "text": "고개를 왼쪽으로 아주 조금 기울여 주세요.",
+      "file": "/audio/voice/neck-left.ogg",
+      "durationSeconds": 2.468208,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 18161,
+      "sha256": "19146be585618fa2b264b34437249b361ea13c5f97ab9064940a7925a4228b54"
+    },
+    "neck-right": {
+      "text": "고개를 오른쪽으로 아주 조금 기울여 주세요.",
+      "file": "/audio/voice/neck-right.ogg",
+      "durationSeconds": 2.571083,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 18729,
+      "sha256": "a9234d3f7023fadbe586b6deb7cf6697c851bb8b149701b6abf6392e3b1a343a"
+    },
+    "shoulder-roll": {
+      "text": "어깨를 천천히 돌리며 힘을 풀어 주세요.",
+      "file": "/audio/voice/shoulder-roll.ogg",
+      "durationSeconds": 2.440083,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 17786,
+      "sha256": "2f8688e8ee8d6a625f5344861520554741bd79004aa96a17cf3e0ddf4f64463b"
+    },
+    "march": {
+      "text": "의자에 앉아 무릎을 조금씩 번갈아 들어 주세요.",
+      "file": "/audio/voice/march.ogg",
+      "durationSeconds": 2.869458,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 20704,
+      "sha256": "3a191a7deea9cc3b3218a87b5b0ca5eed27b85fb08ce1463158c265dd8e1d8b3"
+    },
+    "hamstring-left": {
+      "text": "왼쪽 다리를 앞으로 펴고, 편안한 범위에서 몸을 조금 숙여 주세요.",
+      "file": "/audio/voice/hamstring-left.ogg",
+      "durationSeconds": 4.600042,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 27716,
+      "sha256": "1c607d4a49f6f0668f9ede1ab45473a94969e7f0e72a394f41726f3e3b0a151a"
+    },
+    "hamstring-right": {
+      "text": "오른쪽 다리를 앞으로 펴고, 편안한 범위에서 몸을 조금 숙여 주세요.",
+      "file": "/audio/voice/hamstring-right.ogg",
+      "durationSeconds": 4.6,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 28216,
+      "sha256": "4a010c80c9a108d8dbae5ce64e8c2449b28605892c83e85fe5aa786ac8f0d5a1"
+    },
+    "calf-left": {
+      "text": "왼쪽 다리를 편하게 펴고, 발끝을 몸 쪽으로 당겨 주세요.",
+      "file": "/audio/voice/calf-left.ogg",
+      "durationSeconds": 4.100042,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 25027,
+      "sha256": "0f5766402f134a85a7a638f6f2fa77959530d2455ae95d72e9a117cdaf5d0abd"
+    },
+    "calf-right": {
+      "text": "오른쪽 다리를 편하게 펴고, 발끝을 몸 쪽으로 당겨 주세요.",
+      "file": "/audio/voice/calf-right.ogg",
+      "durationSeconds": 4.2,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 26362,
+      "sha256": "2011b5a37a1e42d37ad9af313d6b8f82c8fd2cc5e88d1cfae84118c38b97465c"
+    },
+    "ankle": {
+      "text": "발목을 천천히 펴고 당겨 주세요.",
+      "file": "/audio/voice/ankle.ogg",
+      "durationSeconds": 2.128292,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bytes": 15972,
+      "sha256": "3e87a1e4ff5a809ff565963e76f5b90c1da035b1cd100f3d5ffe8500bc268b02"
+    }
+  }
+}
